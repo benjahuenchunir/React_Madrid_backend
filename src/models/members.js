@@ -3,19 +3,19 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class Members extends Model {
+  class Member extends Model {
     static associate(models) {
-      Members.belongsTo(models.Chat, { foreignKey: 'id_chat' });
-      Members.belongsTo(models.User, { foreignKey: 'id_user' });
+      Member.belongsTo(models.Chat, { foreignKey: 'id_chat' });
+      Member.belongsTo(models.User, { foreignKey: 'id_user' });
     }
   }
-  Members.init({
+  Member.init({
     id_chat: DataTypes.INTEGER,
     id_user: DataTypes.INTEGER,
     role: DataTypes.ENUM("admin", "member", "owner")
   }, {
     sequelize,
-    modelName: 'Members',
+    modelName: 'Member',
   });
-  return Members;
+  return Member;
 };
