@@ -1,0 +1,19 @@
+{
+  "name": "React_Madrid_backend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:IIC2513/React_Madrid_backend.git",
+  "author": "benjahuenchunir <bahuenchunir@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "dev": "nodemon src/index.js"
+  },
+  "dependencies": {
+    "koa": "^2.15.3",
+    "koa-logger": "^3.2.1",
+    "koa-router": "^12.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.3"
+  }
+}
