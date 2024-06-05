@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
   Members.init({
     id_chat: DataTypes.INTEGER,
     id_user: DataTypes.INTEGER,
-    role: DataTypes.ENUM
+    role: DataTypes.ENUM("admin", "member", "owner")
   }, {
     sequelize,
     modelName: 'Members',

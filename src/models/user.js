@@ -8,8 +8,8 @@ module.exports = (sequelize, DataTypes) => {
       User.belongsToMany(models.Chat, { through: 'Members' });
       User.hasMany(models.Message, { foreignKey: 'id_user' });
       User.hasMany(models.MessageStatus, { foreignKey: 'id_user' });
-      User.hasMany(models.Reports, { foreignKey: 'id_user' });
-      User.hasMany(models.Reports, { foreignKey: 'id_reporter' });
+      User.hasMany(models.Reports, { as: 'Reports', foreignKey: 'id_user' });
+      User.hasMany(models.Reports, { as: 'CreatedReports', foreignKey: 'id_reporter' });
     }
   }
   User.init({
@@ -19,11 +19,10 @@ module.exports = (sequelize, DataTypes) => {
     email: DataTypes.STRING,
     phone: DataTypes.STRING,
     profile_picture_url: DataTypes.STRING,
-    role: DataTypes.ENUM,
+    role: DataTypes.ENUM('user', 'admin'),
   }, {
     sequelize,
     modelName: 'User',
   });
   return User;
 };
-
