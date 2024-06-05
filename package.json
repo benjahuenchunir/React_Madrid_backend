@@ -6,7 +6,8 @@
   "author": "benjahuenchunir <bahuenchunir@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "dev": "nodemon src/index.js"
+    "dev": "nodemon src/index.js",
+    "lint": "eslint ./src --ext .js"
   },
   "dependencies": {
     "@koa/cors": "^5.0.0",
@@ -20,6 +21,7 @@
     "sequelize": "^6.37.3"
   },
   "devDependencies": {
+    "eslint": "7.32.0",
     "nodemon": "^3.1.3",
     "sequelize-cli": "^6.6.2"
   }

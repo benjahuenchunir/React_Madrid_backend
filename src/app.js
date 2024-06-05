@@ -2,7 +2,7 @@ const Koa = require('koa');
 const Logger = require('koa-logger');
 const { koaBody } = require('koa-body');
 const router = require('./routes.js');
-const orm = require('../models');
+const orm = require('./models/index.js');
 const cors = require('@koa/cors');
 
 const app = new Koa();
