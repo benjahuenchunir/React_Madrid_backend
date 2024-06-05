@@ -5,7 +5,8 @@ const {
 module.exports = (sequelize, DataTypes) => {
   class Chat extends Model {
     static associate(models) {
-    
+      Chat.hasMany(models.Members, { foreignKey: 'id_chat' });
+      Chat.hasMany(models.Messages, { foreignKey: 'id_chat' });
     }
   }
   Chat.init({

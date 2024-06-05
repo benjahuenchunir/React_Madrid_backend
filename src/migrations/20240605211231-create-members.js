@@ -10,7 +10,7 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       role: {
-        type: Sequelize.ENUM("admin", "member")
+        type: Sequelize.ENUM("admin", "member", "owner")
       },
       createdAt: {
         allowNull: false,

@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "nodemon src/index.js",
     "lint": "eslint ./src --ext .js",
-    "migrate": "sequelize-cli db:migrate"
+    "db:reset": "sequelize-cli db:drop && sequelize-cli db:create && sequelize-cli db:migrate && sequelize-cli db:seed:all"
   },
   "dependencies": {
     "@koa/cors": "^5.0.0",

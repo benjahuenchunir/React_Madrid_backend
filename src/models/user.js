@@ -5,7 +5,11 @@ const {
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     static associate(models) {
-      
+      User.belongsToMany(models.Chat, { through: 'Members' });
+      User.hasMany(models.Message, { foreignKey: 'id_user' });
+      User.hasMany(models.MessageStatus, { foreignKey: 'id_user' });
+      User.hasMany(models.Reports, { foreignKey: 'id_user' });
+      User.hasMany(models.Reports, { foreignKey: 'id_reporter' });
     }
   }
   User.init({

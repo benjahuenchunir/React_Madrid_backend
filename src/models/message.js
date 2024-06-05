@@ -5,6 +5,11 @@ const {
 module.exports = (sequelize, DataTypes) => {
   class Message extends Model {
     static associate(models) {
+      Message.belongsTo(models.Chat, { foreignKey: 'id_chat' });
+      Message.belongsTo(models.User, { foreignKey: 'id_user' });
+      Message.hasMany(models.Message, { foreignKey: 'responding_to' });
+      Message.hasMany(models.MessageStatus, { foreignKey: 'id_message' });
+      Message.hasMany(models.MessageFiles, { foreignKey: 'id_message' });
     }
   }
   Message.init({
