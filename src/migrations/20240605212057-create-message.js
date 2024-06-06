@@ -27,7 +27,7 @@ module.exports = {
       deletes_at: {
         type: Sequelize.DATE
       },
-      forwaded: {
+      forwarded: {
         type: Sequelize.BOOLEAN
       },
       responding_to: {

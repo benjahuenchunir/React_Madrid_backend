@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
     last_edit_date: DataTypes.DATE,
     pinned: DataTypes.BOOLEAN,
     deletes_at: DataTypes.DATE,
-    forwaded: DataTypes.BOOLEAN,
+    forwarded: DataTypes.BOOLEAN,
     responding_to: DataTypes.INTEGER
   }, {
     sequelize,
