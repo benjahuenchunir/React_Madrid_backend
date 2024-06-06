@@ -10,8 +10,14 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Member.init({
-    id_chat: DataTypes.INTEGER,
-    id_user: DataTypes.INTEGER,
+    id_chat: {
+      type: DataTypes.INTEGER,
+      primaryKey: true
+    },
+    id_user: {
+      type: DataTypes.INTEGER,
+      primaryKey: true
+    },
     role: DataTypes.ENUM("admin", "member", "owner")
   }, {
     sequelize,

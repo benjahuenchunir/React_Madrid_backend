@@ -6,11 +6,11 @@ module.exports = (sequelize, DataTypes) => {
   class Chat extends Model {
     static associate(models) {
       Chat.hasMany(models.Message, { foreignKey: 'id_chat' });
+      Chat.hasMany(models.Member, { foreignKey: 'id_chat' });
     }
   }
   Chat.init({
     name: DataTypes.STRING,
-    created_at: DataTypes.DATE,
     image_url: DataTypes.STRING,
     mode: DataTypes.ENUM("admin-only", "everyone")
   }, {

@@ -1,0 +1,16 @@
+const Router = require('koa-router');
+const { User } = require('../models');
+const router = new Router();
+
+router.get('/', async (ctx) => {
+    try {
+        const users = await User.findAll();
+        ctx.status = 200;
+        ctx.body = users;
+    } catch (error) {
+        ctx.status = 500;
+        ctx.body = { error: error.message };
+    }
+});
+
+module.exports = router;

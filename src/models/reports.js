@@ -10,8 +10,14 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Report.init({
-    id_user: DataTypes.INTEGER,
-    id_reporter: DataTypes.INTEGER,
+    id_user: {
+      type: DataTypes.INTEGER,
+      primaryKey: true
+    },
+    id_reporter: {
+      type: DataTypes.INTEGER,
+      primaryKey: true
+    },
     message: DataTypes.TEXT,
     type: DataTypes.ENUM("spam", "harassment", "other", "inappropriate picture"),
   }, {
