@@ -5,14 +5,19 @@ module.exports = {
     await queryInterface.createTable('MessageStatuses', {
       id_message: {
         type: Sequelize.INTEGER,
-        primaryKey: true
+        primaryKey: true,
+        allowNull: false,
+        autoIncrement: false
       },
       id_user: {
         type: Sequelize.INTEGER,
-        primaryKey: true
+        primaryKey: true,
+        allowNull: false,
+        autoIncrement: false
       },
       status: {
-        type: Sequelize.ENUM("read", "delivered", "pending")
+        type: Sequelize.ENUM("read", "delivered", "pending"),
+        allowNull: false,
       },
       createdAt: {
         allowNull: false,

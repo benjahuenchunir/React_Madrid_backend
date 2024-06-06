@@ -6,16 +6,22 @@ module.exports = {
       id_user: {
         type: Sequelize.INTEGER,
         primaryKey: true,
+        allowNull: false,
+        autoIncrement: false
       },
       id_reporter: {
         type: Sequelize.INTEGER,
         primaryKey: true,
+        allowNull: false,
+        autoIncrement: false
       },
       message: {
-        type: Sequelize.TEXT
+        type: Sequelize.TEXT,
+        allowNull: false,
       },
       type: {
-        type: Sequelize.ENUM("spam", "harassment", "other", "inappropriate picture")
+        type: Sequelize.ENUM("spam", "harassment", "other", "inappropriate picture"),
+        allowNull: false,
       },
       createdAt: {
         allowNull: false,
