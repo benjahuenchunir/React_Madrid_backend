@@ -12,6 +12,10 @@ module.exports = {
       id_message: {
         type: Sequelize.INTEGER,
         allowNull: false,
+        references: {
+          model: 'Messages',
+          key: 'id'
+        }
       },
       file_url: {
         type: Sequelize.STRING,

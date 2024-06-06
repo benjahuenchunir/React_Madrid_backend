@@ -12,10 +12,18 @@ module.exports = {
       id_chat: {
         type: Sequelize.INTEGER,
         allowNull: false,
+        references: {
+          model: 'Chats',
+          key: 'id'
+        }
       },
       id_user: {
         type: Sequelize.INTEGER,
         allowNull: false,
+        references: {
+          model: 'Users',
+          key: 'id'
+        }
       },
       message: {
         type: Sequelize.STRING

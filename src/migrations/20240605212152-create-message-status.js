@@ -7,13 +7,21 @@ module.exports = {
         type: Sequelize.INTEGER,
         primaryKey: true,
         allowNull: false,
-        autoIncrement: false
+        autoIncrement: false,
+        references: {
+          model: 'Messages',
+          key: 'id'
+        }
       },
       id_user: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         allowNull: false,
-        autoIncrement: false
+        autoIncrement: false,
+        references: {
+          model: 'Users',
+          key: 'id'
+        }
       },
       status: {
         type: Sequelize.ENUM("read", "delivered", "pending"),

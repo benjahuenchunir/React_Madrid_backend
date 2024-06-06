@@ -7,13 +7,21 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         primaryKey: true,
-        autoIncrement: false
+        autoIncrement: false,
+        references: {
+          model: 'Chats',
+          key: 'id'
+        }
       },
       id_user: {
         type: Sequelize.INTEGER,
         allowNull: false,
         primaryKey: true,
-        autoIncrement: false
+        autoIncrement: false,
+        references: {
+          model: 'Users',
+          key: 'id'
+        }
       },
       role: {
         type: Sequelize.ENUM("admin", "member", "owner"),

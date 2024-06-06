@@ -7,13 +7,21 @@ module.exports = {
         type: Sequelize.INTEGER,
         primaryKey: true,
         allowNull: false,
-        autoIncrement: false
+        autoIncrement: false,
+        references: {
+          model: 'Users',
+          key: 'id'
+        }
       },
       id_reporter: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         allowNull: false,
-        autoIncrement: false
+        autoIncrement: false,
+        references: {
+          model: 'Users',
+          key: 'id'
+        }
       },
       message: {
         type: Sequelize.TEXT,
