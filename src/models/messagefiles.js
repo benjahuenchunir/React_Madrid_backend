@@ -3,17 +3,17 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class MessageFiles extends Model {
+  class MessageFile extends Model {
     static associate(models) {
-      MessageFiles.belongsTo(models.Message, { foreignKey: 'id_message' });
+      MessageFile.belongsTo(models.Message, { foreignKey: 'id_message' });
     }
   }
-  MessageFiles.init({
+  MessageFile.init({
     id_message: DataTypes.INTEGER,
     file_url: DataTypes.STRING
   }, {
     sequelize,
-    modelName: 'MessageFiles',
+    modelName: 'MessageFile',
   });
-  return MessageFiles;
+  return MessageFile;
 };

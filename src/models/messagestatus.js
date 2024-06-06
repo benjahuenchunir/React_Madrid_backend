@@ -10,8 +10,14 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   MessageStatus.init({
-    id_message: DataTypes.INTEGER,
-    id_user: DataTypes.INTEGER,
+    id_message: {
+      type: DataTypes.INTEGER,
+      primaryKey: true
+    },
+    id_user: {
+      type: DataTypes.INTEGER,
+      primaryKey: true
+    },
     status: DataTypes.ENUM("read", "delivered", "pending")
   }, {
     sequelize,

@@ -10,13 +10,15 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       name: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false,
       },
       image_url: {
         type: Sequelize.STRING
       },
       mode: {
-        type: Sequelize.ENUM("admin-only", "everyone")
+        type: Sequelize.ENUM("admin-only", "everyone"),
+        allowNull: false,
       },
       createdAt: {
         allowNull: false,

@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
       Message.belongsTo(models.User, { foreignKey: 'id_user' });
       Message.hasMany(models.Message, { foreignKey: 'responding_to' });
       Message.hasMany(models.MessageStatus, { foreignKey: 'id_message' });
-      Message.hasMany(models.MessageFiles, { foreignKey: 'id_message' });
+      Message.hasMany(models.MessageFile, { foreignKey: 'id_message' });
     }
   }
   Message.init({
@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
     last_edit_date: DataTypes.DATE,
     pinned: DataTypes.BOOLEAN,
     deletes_at: DataTypes.DATE,
-    forwaded: DataTypes.BOOLEAN,
+    forwarded: DataTypes.BOOLEAN,
     responding_to: DataTypes.INTEGER
   }, {
     sequelize,

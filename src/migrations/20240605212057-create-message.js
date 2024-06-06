@@ -10,10 +10,20 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       id_chat: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'Chats',
+          key: 'id'
+        }
       },
       id_user: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'Users',
+          key: 'id'
+        }
       },
       message: {
         type: Sequelize.STRING
@@ -22,13 +32,15 @@ module.exports = {
         type: Sequelize.DATE
       },
       pinned: {
-        type: Sequelize.BOOLEAN
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
       },
       deletes_at: {
         type: Sequelize.DATE
       },
-      forwaded: {
-        type: Sequelize.BOOLEAN
+      forwarded: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
       },
       responding_to: {
         type: Sequelize.INTEGER
