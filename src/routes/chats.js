@@ -1,5 +1,5 @@
 const Router = require('koa-router');
-const { Chat, User } = require('../models');
+const { Chat, User, Message} = require('../models');
 const router = new Router();
 
 router.get('/', async (ctx) => {
@@ -10,6 +10,10 @@ router.get('/', async (ctx) => {
             attributes: ['name', 'image_url'],
             include: [{
                 model: User
+            }, {
+                model: Message,
+                limit: 1,
+                order: [['createdAt', 'DESC']]
             }]
         });
         
@@ -30,7 +34,11 @@ router.get('/', async (ctx) => {
             return {
                 id: modifiedChat.id,
                 name: modifiedChat.name,
-                image_url: modifiedChat.image_url
+                image_url: modifiedChat.image_url,
+                last_message: {
+                    message: modifiedChat.Messages[0].message,
+                    time: modifiedChat.Messages[0].createdAt
+                }
             };
         });
 
