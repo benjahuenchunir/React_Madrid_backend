@@ -1,11 +1,11 @@
 const Router = require('koa-router');
-const { Chat, User, Message} = require('../models');
+const { Chat, User, Message } = require('../models');
 const router = new Router();
 
 function transformChat(chat, userId) {
     let modifiedChat = { ...chat.toJSON() };
 
-    if (modifiedChat.Users.length === 2) {
+    if (isDM(chat)) {
         const otherUser = modifiedChat.Users.find(user => user.id !== userId);
 
         modifiedChat.name = `${otherUser.name} ${otherUser.last_name}`;
@@ -13,6 +13,10 @@ function transformChat(chat, userId) {
     }
 
     return modifiedChat;
+}
+
+function isDM(chat) {
+    return chat.Users.length === 2;
 }
 
 router.get('/', async (ctx) => {
@@ -29,8 +33,8 @@ router.get('/', async (ctx) => {
                 order: [['createdAt', 'DESC']]
             }]
         });
-        
-        const userChats = allChats.filter(chat => 
+
+        const userChats = allChats.filter(chat =>
             chat.Users.some(user => user.id === userId)
         );
 
@@ -39,11 +43,12 @@ router.get('/', async (ctx) => {
             return {
                 id: modifiedChat.id,
                 name: modifiedChat.name,
-                image_url: modifiedChat.image_url,
-                last_message: {
+                imageUrl: modifiedChat.image_url,
+                lastMessage: {
                     message: modifiedChat.Messages[0].message,
                     time: modifiedChat.Messages[0].createdAt
-                }
+                },
+                isDm: isDM(chat)
             };
         });
 
@@ -68,7 +73,7 @@ router.get('/:id', async (ctx) => {
                 order: [['createdAt', 'DESC']],
                 include: [{
                     model: User,
-                    attributes: ['id', 'name']
+                    attributes: ['id', 'name', 'profile_picture_url']
                 }]
             }]
         });
@@ -85,7 +90,8 @@ router.get('/:id', async (ctx) => {
             time: message.createdAt,
             user: {
                 id: message.User.id,
-                name: message.User.name
+                name: message.User.name,
+                profilePictureUrl: message.User.profile_picture_url
             }
         }));
 
