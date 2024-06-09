@@ -29,8 +29,8 @@ router.get('/', async (ctx) => {
                 model: User
             }, {
                 model: Message,
+                order: [['id', 'DESC']],
                 limit: 1,
-                order: [['createdAt', 'DESC']]
             }]
         });
 
