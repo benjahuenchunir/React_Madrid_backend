@@ -11,6 +11,14 @@ module.exports = (sequelize, DataTypes) => {
       User.hasMany(models.Report, { as: 'Report', foreignKey: 'id_user' });
       User.hasMany(models.Report, { as: 'CreatedReport', foreignKey: 'id_reporter' });
     }
+
+    toDomain() {
+      return {
+        id: this.id,
+        name: this.name,
+        profilePictureUrl: this.profile_picture_url
+      };
+    }
   }
   User.init({
     name: DataTypes.STRING,

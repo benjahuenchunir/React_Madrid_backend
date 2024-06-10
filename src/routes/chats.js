@@ -1,5 +1,5 @@
 const Router = require('koa-router');
-const { Chat, User, Message } = require('../models');
+const { Chat, User, Message, MessageFile } = require('../models');
 const router = new Router();
 
 function transformChat(chat, userId) {
@@ -55,6 +55,7 @@ router.get('/', async (ctx) => {
         ctx.status = 200;
         ctx.body = modifiedChats;
     } catch (error) {
+        console.log(error);
         ctx.status = 500;
         ctx.body = { error: error.message };
     }
@@ -70,12 +71,14 @@ router.get('/:id', async (ctx) => {
                 model: User
             }, {
                 model: Message,
-                order: [['createdAt', 'DESC']],
                 include: [{
                     model: User,
                     attributes: ['id', 'name', 'profile_picture_url']
+                }, {
+                    model: MessageFile
                 }]
-            }]
+            }],
+            order: [[Message, 'createdAt', 'ASC']]
         });
 
         if (!chat) {
@@ -84,20 +87,19 @@ router.get('/:id', async (ctx) => {
             return;
         }
 
+
         const messages = chat.Messages.map(message => ({
             id: message.id,
             message: message.message,
             time: message.createdAt,
-            user: {
-                id: message.User.id,
-                name: message.User.name,
-                profilePictureUrl: message.User.profile_picture_url
-            }
+            user: message.User.toDomain(),
+            files: message.MessageFiles.map(file => file.toDomain())
         }));
 
         ctx.status = 200;
         ctx.body = messages;
     } catch (error) {
+        console.log(error);
         ctx.status = 500;
         ctx.body = { error: error.message };
     }

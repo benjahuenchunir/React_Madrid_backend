@@ -16,7 +16,10 @@ module.exports = (sequelize, DataTypes) => {
     id_chat: DataTypes.INTEGER,
     id_user: DataTypes.INTEGER,
     message: DataTypes.STRING,
-    last_edit_date: DataTypes.DATE,
+    last_edit_date: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
     pinned: DataTypes.BOOLEAN,
     deletes_at: DataTypes.DATE,
     forwarded: DataTypes.BOOLEAN,
