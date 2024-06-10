@@ -1,5 +1,5 @@
 const Router = require('koa-router');
-const { Message, Member, MessageStatus, User, MessageFile } = require('../models');
+const { Message, Member, MessageStatus, User, MessageFile, Chat } = require('../models');
 const router = new Router();
 const cloudinary = require('./../utils/cloudinaryConfig');
 const multer = require('@koa/multer');
@@ -12,10 +12,21 @@ router.post('/', upload.array('files'), async (ctx) => {
     try {
         const { idUser, idChat, message, pinned, deletesAt, forwarded, respondingTo } = ctx.request.body;
         const files = ctx.request.files;
-
+        
+        // Validate params
         if (!idUser || !idChat || (!message && (!files || files.length === 0))) {
             ctx.status = 400;
             ctx.body = { error: 'Se requiere idUser, idChat y message o files' };
+            return;
+        }
+        
+        // Check if user is a member of the chat and has permission to send messages
+        const chat = await Chat.findOne({ where: { id: idChat } });
+        const member = await Member.findOne({ where: { id_chat: idChat, id_user: idUser } });
+
+        if (!member || (chat.mode !== 'everyone' && member.role === 'member')) {
+            ctx.status = 403;
+            ctx.body = { error: 'No tienes permiso para enviar mensajes en este chat' };
             return;
         }
 
