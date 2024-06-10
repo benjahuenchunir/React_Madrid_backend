@@ -66,11 +66,10 @@ router.post('/', upload.array('files'), async (ctx) => {
             }));
         }
 
-        const { createdAt: time, ...messageData } = newMessage.toJSON();
         const user = await User.findOne({ where: { id: idUser }, attributes: ['id', 'name', 'profile_picture_url'] });
 
         ctx.status = 201;
-        ctx.body = { ...messageData, time, user: user.toDomain(), files: messageFiles };
+        ctx.body = { ...newMessage.toDomain(), user: user.toDomain(), files: messageFiles };
     } catch (error) {
         console.log(error);
         ctx.status = 500;

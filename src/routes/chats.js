@@ -80,7 +80,7 @@ router.get('/:id', async (ctx) => {
                     model: MessageFile
                 }]
             }],
-            order: [[Message, 'createdAt', 'ASC']]
+            order: [[Message, 'id', 'ASC']]
         });
 
         if (!chat) {
@@ -91,9 +91,7 @@ router.get('/:id', async (ctx) => {
 
 
         const messages = chat.Messages.map(message => ({
-            id: message.id,
-            message: message.message,
-            time: message.createdAt,
+            ...message.toDomain(),
             user: message.User.toDomain(),
             files: message.MessageFiles.map(file => file.toDomain())
         }));
