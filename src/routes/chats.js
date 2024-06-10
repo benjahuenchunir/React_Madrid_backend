@@ -1,6 +1,7 @@
 const Router = require('koa-router');
 const { Chat, User, Message, MessageFile } = require('../models');
 const router = new Router();
+const canSendMessage = require('../utils/permissions');
 
 function transformChat(chat, userId) {
     let modifiedChat = { ...chat.toJSON() };
@@ -24,7 +25,7 @@ router.get('/', async (ctx) => {
         const userId = Number(ctx.query.userId);
 
         const allChats = await Chat.findAll({
-            attributes: ['name', 'image_url'],
+            attributes: ['name', 'image_url', 'mode'],
             include: [{
                 model: User
             }, {
@@ -38,19 +39,20 @@ router.get('/', async (ctx) => {
             chat.Users.some(user => user.id === userId)
         );
 
-        const modifiedChats = userChats.map(chat => {
+        const modifiedChats = await Promise.all(userChats.map(async chat => {
             const modifiedChat = transformChat(chat, userId);
             return {
                 id: modifiedChat.id,
                 name: modifiedChat.name,
                 imageUrl: modifiedChat.image_url,
+                canSendMessage: await canSendMessage(userId, modifiedChat.id),
                 lastMessage: {
                     message: modifiedChat.Messages[0].message,
                     time: modifiedChat.Messages[0].createdAt
                 },
                 isDm: isDM(chat)
             };
-        });
+        }));
 
         ctx.status = 200;
         ctx.body = modifiedChats;
