@@ -6,7 +6,9 @@ module.exports = {
     return queryInterface.bulkInsert('MessageFiles', [
       {
         id_message: 4,
-        file_url: 'https://example.com/file1.pdf',
+        name: 'info.pdf',
+        size: 1024,
+        file_url: 'https://res.cloudinary.com/dmfsapvzv/image/upload/v1718031326/efbor2ydmljlasfj2dkr.jpg',
         createdAt: new Date(),
         updatedAt: new Date()
       }

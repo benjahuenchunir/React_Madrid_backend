@@ -11,12 +11,31 @@ module.exports = (sequelize, DataTypes) => {
       Message.hasMany(models.MessageStatus, { foreignKey: 'id_message' });
       Message.hasMany(models.MessageFile, { foreignKey: 'id_message' });
     }
+
+    toDomain() {
+      return {
+        id: this.id,
+        idChat: this.id_chat,
+        idUser: this.id_user,
+        message: this.message,
+        lastEditDate: this.last_edit_date,
+        pinned: this.pinned,
+        deletesAt: this.deletes_at,
+        forwarded: this.forwarded,
+        respondingTo: this.responding_to,
+        time: this.createdAt,
+      };
+    }
   }
+
   Message.init({
     id_chat: DataTypes.INTEGER,
     id_user: DataTypes.INTEGER,
     message: DataTypes.STRING,
-    last_edit_date: DataTypes.DATE,
+    last_edit_date: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
     pinned: DataTypes.BOOLEAN,
     deletes_at: DataTypes.DATE,
     forwarded: DataTypes.BOOLEAN,

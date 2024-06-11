@@ -36,7 +36,8 @@ module.exports = {
         allowNull: false,
       },
       deletes_at: {
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        allowNull: true,
       },
       forwarded: {
         type: Sequelize.BOOLEAN,

@@ -1,6 +1,7 @@
 const Router = require('koa-router');
-const { Chat, User, Message } = require('../models');
+const { Chat, User, Message, MessageFile } = require('../models');
 const router = new Router();
+const canSendMessage = require('../utils/permissions');
 
 function transformChat(chat, userId) {
     let modifiedChat = { ...chat.toJSON() };
@@ -24,13 +25,13 @@ router.get('/', async (ctx) => {
         const userId = Number(ctx.query.userId);
 
         const allChats = await Chat.findAll({
-            attributes: ['name', 'image_url'],
+            attributes: ['name', 'image_url', 'mode'],
             include: [{
                 model: User
             }, {
                 model: Message,
+                order: [['id', 'DESC']],
                 limit: 1,
-                order: [['createdAt', 'DESC']]
             }]
         });
 
@@ -38,23 +39,25 @@ router.get('/', async (ctx) => {
             chat.Users.some(user => user.id === userId)
         );
 
-        const modifiedChats = userChats.map(chat => {
+        const modifiedChats = await Promise.all(userChats.map(async chat => {
             const modifiedChat = transformChat(chat, userId);
             return {
                 id: modifiedChat.id,
                 name: modifiedChat.name,
                 imageUrl: modifiedChat.image_url,
+                canSendMessage: await canSendMessage(userId, modifiedChat.id),
                 lastMessage: {
                     message: modifiedChat.Messages[0].message,
                     time: modifiedChat.Messages[0].createdAt
                 },
                 isDm: isDM(chat)
             };
-        });
+        }));
 
         ctx.status = 200;
         ctx.body = modifiedChats;
     } catch (error) {
+        console.log(error);
         ctx.status = 500;
         ctx.body = { error: error.message };
     }
@@ -70,12 +73,14 @@ router.get('/:id', async (ctx) => {
                 model: User
             }, {
                 model: Message,
-                order: [['createdAt', 'DESC']],
                 include: [{
                     model: User,
                     attributes: ['id', 'name', 'profile_picture_url']
+                }, {
+                    model: MessageFile
                 }]
-            }]
+            }],
+            order: [[Message, 'id', 'ASC']]
         });
 
         if (!chat) {
@@ -84,20 +89,17 @@ router.get('/:id', async (ctx) => {
             return;
         }
 
+
         const messages = chat.Messages.map(message => ({
-            id: message.id,
-            message: message.message,
-            time: message.createdAt,
-            user: {
-                id: message.User.id,
-                name: message.User.name,
-                profilePictureUrl: message.User.profile_picture_url
-            }
+            ...message.toDomain(),
+            user: message.User.toDomain(),
+            files: message.MessageFiles.map(file => file.toDomain())
         }));
 
         ctx.status = 200;
         ctx.body = messages;
     } catch (error) {
+        console.log(error);
         ctx.status = 500;
         ctx.body = { error: error.message };
     }

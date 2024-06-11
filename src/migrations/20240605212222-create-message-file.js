@@ -17,6 +17,14 @@ module.exports = {
           key: 'id'
         }
       },
+      name: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      size: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+      },
       file_url: {
         type: Sequelize.STRING,
         allowNull: false,
