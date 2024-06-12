@@ -90,11 +90,7 @@ router.get('/:id', async (ctx) => {
         }
 
 
-        const messages = chat.Messages.map(message => ({
-            ...message.toDomain(),
-            user: message.User.toDomain(),
-            files: message.MessageFiles.map(file => file.toDomain())
-        }));
+        const messages = await Promise.all(chat.Messages.map(message => message.getFullMessage()));
 
         ctx.status = 200;
         ctx.body = messages;

@@ -41,7 +41,7 @@ router.post('/', upload.array('files'), async (ctx) => {
 
         // Create message statuses for all chat members except the sender
         const members = await Member.findAll({ where: { id_chat: idChat } });
-        const messageStatuses = await Promise.all(
+        await Promise.all(
             members
                 .filter(member => member.id_user !== idUser)
                 .map(member => MessageStatus.create({
@@ -51,9 +51,8 @@ router.post('/', upload.array('files'), async (ctx) => {
         ); // TODO send statuses
 
         // Create message files
-        let messageFiles = [];
         if (files && files.length > 0) {
-            messageFiles = await Promise.all(files.map(async (file) => {
+            await Promise.all(files.map(async (file) => {
                 const result = await cloudinary.uploader.upload(file.path, { resource_type: "raw" });
                 const messageFile = await MessageFile.create({
                     id_message: newMessage.id,
@@ -66,10 +65,8 @@ router.post('/', upload.array('files'), async (ctx) => {
             }));
         }
 
-        const user = await User.findOne({ where: { id: idUser }, attributes: ['id', 'name', 'profile_picture_url'] });
-
         ctx.status = 201;
-        ctx.body = { ...newMessage.toDomain(), user: user.toDomain(), files: messageFiles };
+        ctx.body = await newMessage.getFullMessage();
     } catch (error) {
         console.log(error);
         ctx.status = 500;
@@ -104,11 +101,9 @@ router.patch('/:id', async (ctx) => {
         }
 
         const updatedMessage = await Message.findOne({ where: { id: id } });
-        const user = await User.findOne({ where: { id: updatedMessage.id_user }, attributes: ['id', 'name', 'profile_picture_url'] });
-        const messageFiles = await MessageFile.findAll({ where: { id_message: id } });
 
         ctx.status = 200;
-        ctx.body = { ...updatedMessage.toDomain(), user: user.toDomain(), files: messageFiles.map(file => file.toDomain()) };
+        ctx.body = await updatedMessage.getFullMessage();
     } catch (error) {
         console.log(error);
         ctx.status = 500;

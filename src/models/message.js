@@ -26,6 +26,12 @@ module.exports = (sequelize, DataTypes) => {
         time: this.createdAt,
       };
     }
+
+    async getFullMessage() {
+      const user = await this.getUser({ attributes: ['id', 'name', 'profile_picture_url'] });
+      const messageFiles = await this.getMessageFiles();
+      return { ...this.toDomain(), user: user.toDomain(), files: messageFiles.map(file => file.toDomain()) };
+    }
   }
 
   Message.init({
