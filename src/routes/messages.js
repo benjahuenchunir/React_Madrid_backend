@@ -77,4 +77,43 @@ router.post('/', upload.array('files'), async (ctx) => {
     }
 });
 
+router.patch('/:id', async (ctx) => {
+    try {
+        const { id } = ctx.params;
+        const { message, pinned, deletesAt } = ctx.request.body;
+
+        if (!id) {
+            ctx.status = 400;
+            ctx.body = { error: 'Se requiere la id del mensaje' };
+            return;
+        }
+
+        const updateData = {};
+        if (message !== undefined) updateData.message = message;
+        if (pinned !== undefined) updateData.pinned = pinned;
+        if (deletesAt !== undefined) updateData.deletes_at = deletesAt;
+
+        const [updatedRows] = await Message.update(updateData, {
+            where: { id: id }
+        });
+
+        if (updatedRows === 0) {
+            ctx.status = 404;
+            ctx.body = { error: 'No se encontró un mensaje con esa id' };
+            return;
+        }
+
+        const updatedMessage = await Message.findOne({ where: { id: id } });
+        const user = await User.findOne({ where: { id: updatedMessage.id_user }, attributes: ['id', 'name', 'profile_picture_url'] });
+        const messageFiles = await MessageFile.findAll({ where: { id_message: id } });
+
+        ctx.status = 200;
+        ctx.body = { ...updatedMessage.toDomain(), user: user.toDomain(), files: messageFiles.map(file => file.toDomain()) };
+    } catch (error) {
+        console.log(error);
+        ctx.status = 500;
+        ctx.body = { error: error.message };
+    }
+});
+
 module.exports = router;
