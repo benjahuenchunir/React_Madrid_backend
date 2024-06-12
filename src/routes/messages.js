@@ -37,18 +37,7 @@ router.post('/', upload.array('files'), async (ctx) => {
             deletes_at: deletesAt || null,
             forwarded: forwarded,
             responding_to: respondingTo || null
-        });
-
-        // Create message statuses for all chat members except the sender
-        const members = await Member.findAll({ where: { id_chat: idChat } });
-        await Promise.all(
-            members
-                .filter(member => member.id_user !== idUser)
-                .map(member => MessageStatus.create({
-                    id_user: member.id_user,
-                    id_message: newMessage.id
-                }))
-        ); // TODO send statuses
+        });        
 
         // Create message files
         if (files && files.length > 0) {

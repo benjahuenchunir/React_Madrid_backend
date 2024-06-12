@@ -49,6 +49,20 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'Message',
+    hooks: {
+      afterCreate: async (message) => {
+        const chat = await message.getChat();
+        const members = await chat.getMembers();
+        const otherMembers = members.filter(member => member.id_user !== message.id_user);
+
+        const messageStatuses = otherMembers.map(member => ({
+          id_message: message.id,
+          id_user: member.id_user
+        }));
+
+        await sequelize.models.MessageStatus.bulkCreate(messageStatuses);
+      }
+    }
   });
   return Message;
 };
