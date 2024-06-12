@@ -80,7 +80,7 @@ router.get('/:id', async (ctx) => {
                     model: MessageFile
                 }]
             }],
-            order: [[Message, 'id', 'ASC']]
+            order: [[Message, 'createdAt', 'ASC']]
         });
 
         if (!chat) {

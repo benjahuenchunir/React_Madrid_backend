@@ -36,6 +36,17 @@ module.exports = {
         role: 'user',
         createdAt: new Date(),
         updatedAt: new Date()
+      },
+      {
+        name: 'Admin',
+        last_name: 'Admin',
+        password: 'password',
+        email: 'admin@example.com',
+        phone: '5432167890',
+        profile_picture_url: 'https://ui-avatars.com/api/?name=Admin+Admin',
+        role: 'admin',
+        createdAt: new Date(),
+        updatedAt: new Date()
       }
     ]);
   },
