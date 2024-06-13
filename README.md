@@ -30,6 +30,38 @@ yarn db:reset
 yarn dev
 ```
 
+## Testing
+
+1. Correr los tests y ver la cobertura:
+
+```bash
+yarn test
+```
+
+## Dependencias
+
+- `koa`: Marco para la creación de la API
+- `@koa/cors`: Permite habilitar CORS
+- `koa-body`: Middleware para analizar el cuerpo de las solicitudes HTTP
+- `koa-logger`: Middleware para registrar las solicitudes y respuestas HTTP
+- `koa-router`: Router para Koa
+- `dotenv`: Carga variables de entorno desde un archivo `.env` a `process.env`.
+- `multer`: Middleware para la carga de archivos
+- `@koa/multer`: Middleware para la carga de archivos con Koa
+- `cloudinary`: Cliente para el servicio de almacenamiento de imágenes o archivos
+- `pg`: Cliente para la base de datos PostgreSQL
+- `pg-hstore`: Serializador/deserializador para el tipo de datos hstore de PostgreSQL
+- `sequelize`: ORM (Object-Relational Mapping) para Node.js
+
+## Dependencias de develop
+
+- `eslint`: Herramienta de linting y formateo de código
+- `nodemon`: Reinicia automáticamente la API cuando se realizan cambios en el código
+- `sequelize-cli`: Permite utilizar comandos para Sequelize.
+- `jest`: Para testing
+- `faker`: Genera datos falsos para testing
+- `supertest:` Para testear requests
+
 ## Diagrama Entidad-Relación :scroll:
 ![ER-Model](assets/ER-Model.png)
 

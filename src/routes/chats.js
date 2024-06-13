@@ -41,15 +41,18 @@ router.get('/', async (ctx) => {
 
         const modifiedChats = await Promise.all(userChats.map(async chat => {
             const modifiedChat = transformChat(chat, userId);
+            const lastMessage = modifiedChat.Messages[0];
             return {
                 id: modifiedChat.id,
                 name: modifiedChat.name,
                 imageUrl: modifiedChat.image_url,
                 canSendMessage: await canSendMessage(userId, modifiedChat.id),
-                lastMessage: {
-                    message: modifiedChat.Messages[0].message,
-                    time: modifiedChat.Messages[0].createdAt
-                },
+                lastMessage: lastMessage
+                    ? {
+                        message: lastMessage.message,
+                        time: lastMessage.createdAt
+                      }
+                    : null,
                 isDm: isDM(chat)
             };
         }));
@@ -96,6 +99,17 @@ router.get('/:id', async (ctx) => {
         ctx.body = messages;
     } catch (error) {
         console.log(error);
+        ctx.status = 500;
+        ctx.body = { error: error.message };
+    }
+});
+
+router.post('/', async (ctx) => {
+    try {
+        const newChat = await Chat.create(ctx.request.body);
+        ctx.status = 201;
+        ctx.body = newChat;
+    } catch (error) {
         ctx.status = 500;
         ctx.body = { error: error.message };
     }
