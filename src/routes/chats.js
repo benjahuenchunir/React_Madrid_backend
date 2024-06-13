@@ -101,4 +101,15 @@ router.get('/:id', async (ctx) => {
     }
 });
 
+router.post('/', async (ctx) => {
+    try {
+        const newChat = await Chat.create(ctx.request.body);
+        ctx.status = 201;
+        ctx.body = newChat;
+    } catch (error) {
+        ctx.status = 500;
+        ctx.body = { error: error.message };
+    }
+});
+
 module.exports = router;
