@@ -1,5 +1,5 @@
 const Router = require('koa-router');
-const { Message, Member, MessageStatus, User, MessageFile } = require('../models');
+const { Message, MessageFile } = require('../models');
 const router = new Router();
 const cloudinary = require('./../utils/cloudinaryConfig');
 const multer = require('@koa/multer');
@@ -75,7 +75,10 @@ router.patch('/:id', async (ctx) => {
         }
 
         const updateData = {};
-        if (message !== undefined) updateData.message = message;
+        if (message !== undefined) {
+            updateData.message = message;
+            updateData.last_edit_date = new Date();
+        }
         if (pinned !== undefined) updateData.pinned = pinned;
         if (deletesAt !== undefined) updateData.deletes_at = deletesAt;
 
@@ -93,6 +96,35 @@ router.patch('/:id', async (ctx) => {
 
         ctx.status = 200;
         ctx.body = await updatedMessage.getFullMessage();
+    } catch (error) {
+        console.log(error);
+        ctx.status = 500;
+        ctx.body = { error: error.message };
+    }
+});
+
+router.delete('/:id', async (ctx) => {
+    try {
+        const { id } = ctx.params;
+
+        if (!id) {
+            ctx.status = 400;
+            ctx.body = { error: 'Se requiere la id del mensaje' };
+            return;
+        }
+
+        const deletedRows = await Message.destroy({
+            where: { id: id }
+        });
+
+        if (deletedRows === 0) {
+            ctx.status = 404;
+            ctx.body = { error: 'No se encontró un mensaje con esa id' };
+            return;
+        }
+
+        ctx.status = 200;
+        ctx.body = { message: 'Mensaje eliminado con éxito' };
     } catch (error) {
         console.log(error);
         ctx.status = 500;
