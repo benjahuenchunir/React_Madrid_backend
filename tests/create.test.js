@@ -1,7 +1,6 @@
 const request = require('supertest');
 const app = require('../src/app');
 
-
 test('Create a new user', async () => {
     const newUser = {
         name: 'Test User',
