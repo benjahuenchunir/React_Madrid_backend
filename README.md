@@ -30,6 +30,14 @@ yarn db:reset
 yarn dev
 ```
 
+## Testing
+
+1. Correr los tests y ver la cobertura:
+
+```bash
+yarn test
+```
+
 ## Dependencias
 
 - `koa`: Marco para la creación de la API
