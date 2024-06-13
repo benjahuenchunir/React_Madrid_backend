@@ -5,7 +5,7 @@ const {
 module.exports = (sequelize, DataTypes) => {
   class MessageFile extends Model {
     static associate(models) {
-      MessageFile.belongsTo(models.Message, { foreignKey: 'id_message' });
+      MessageFile.belongsTo(models.Message, { foreignKey: 'id_message'});
     }
 
     toDomain() {

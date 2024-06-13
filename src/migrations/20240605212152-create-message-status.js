@@ -11,7 +11,8 @@ module.exports = {
         references: {
           model: 'Messages',
           key: 'id'
-        }
+        },
+        onDelete: 'CASCADE',
       },
       id_user: {
         type: Sequelize.INTEGER,

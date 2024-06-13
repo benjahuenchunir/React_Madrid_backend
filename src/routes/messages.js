@@ -103,4 +103,33 @@ router.patch('/:id', async (ctx) => {
     }
 });
 
+router.delete('/:id', async (ctx) => {
+    try {
+        const { id } = ctx.params;
+
+        if (!id) {
+            ctx.status = 400;
+            ctx.body = { error: 'Se requiere la id del mensaje' };
+            return;
+        }
+
+        const deletedRows = await Message.destroy({
+            where: { id: id }
+        });
+
+        if (deletedRows === 0) {
+            ctx.status = 404;
+            ctx.body = { error: 'No se encontró un mensaje con esa id' };
+            return;
+        }
+
+        ctx.status = 200;
+        ctx.body = { message: 'Mensaje eliminado con éxito' };
+    } catch (error) {
+        console.log(error);
+        ctx.status = 500;
+        ctx.body = { error: error.message };
+    }
+});
+
 module.exports = router;
