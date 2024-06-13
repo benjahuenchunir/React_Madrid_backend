@@ -1,5 +1,5 @@
 const Router = require('koa-router');
-const { Message, Member, MessageStatus, User, MessageFile } = require('../models');
+const { Message, MessageFile } = require('../models');
 const router = new Router();
 const cloudinary = require('./../utils/cloudinaryConfig');
 const multer = require('@koa/multer');
@@ -75,7 +75,10 @@ router.patch('/:id', async (ctx) => {
         }
 
         const updateData = {};
-        if (message !== undefined) updateData.message = message;
+        if (message !== undefined) {
+            updateData.message = message;
+            updateData.last_edit_date = new Date();
+        }
         if (pinned !== undefined) updateData.pinned = pinned;
         if (deletesAt !== undefined) updateData.deletes_at = deletesAt;
 
