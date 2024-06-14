@@ -1,6 +1,7 @@
 # React Madrid Backend
 
 * :link: **Backend:** https://react-madrid-backend.onrender.com/
+* :link: **Docs:** https://react-madrid-backend.onrender.com/docs
 
 ## Setup
 
@@ -38,6 +39,10 @@ yarn dev
 yarn test
 ```
 
+## Docs
+
+Para ver los docs en local simplemente ingresa al endpoint `/docs` desde la pagina principal.
+
 ## Dependencias
 
 - `koa`: Marco para la creación de la API
@@ -52,6 +57,7 @@ yarn test
 - `pg`: Cliente para la base de datos PostgreSQL
 - `pg-hstore`: Serializador/deserializador para el tipo de datos hstore de PostgreSQL
 - `sequelize`: ORM (Object-Relational Mapping) para Node.js
+- `koa2-swagger-ui`: UI para documentación de la API
 
 ## Dependencias de develop
 

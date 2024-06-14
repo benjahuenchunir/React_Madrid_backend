@@ -37,20 +37,19 @@ router.post('/', upload.array('files'), async (ctx) => {
             deletes_at: deletesAt || null,
             forwarded: forwarded,
             responding_to: respondingTo || null
-        });        
+        });
 
         // Create message files
         if (files && files.length > 0) {
-            await Promise.all(files.map(async (file) => {
+            await Promise.all(files.forEach(async (file) => {
                 const result = await cloudinary.uploader.upload(file.path, { resource_type: "raw" });
-                const messageFile = await MessageFile.create({
+                await MessageFile.create({
                     id_message: newMessage.id,
                     name: file.originalname,
                     size: file.size,
                     file_url: result.url
                 });
                 await unlink(file.path);
-                return messageFile.toDomain();
             }));
         }
 
