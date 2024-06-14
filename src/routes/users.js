@@ -17,7 +17,7 @@ router.post('/', async (ctx) => {
     try {
         const newUser = await User.create(ctx.request.body);
         ctx.status = 201;
-        ctx.body = newUser;
+        ctx.body = newUser.toDomain();
     } catch (error) {
         ctx.status = 500;
         ctx.body = { error: error.message };

@@ -19,11 +19,11 @@ paths:
   /users:
     get:
       tags: ["users", ]
-      summary: "List all users"
-      description: "Fetches all users from the database."
+      summary: "Recupera todos los usuarios"
+      description: "Recupera todos los usuarios de la base de datos."
       responses:
         200:
-          description: "A list of users."
+          description: "Una lista de usuarios"
           schema:
             type: "array"
             items:
@@ -34,18 +34,18 @@ paths:
             $ref: '#/definitions/Error'
     post:
       tags: ["users", ]
-      summary: "Create a new user"
-      description: "Creates a new user with the provided data."
+      summary: "Crear un nuevo usuario"
+      description: "Crea un nuevo usuario con los datos proporcionados."
       parameters:
         - in: "body"
           name: "body"
-          description: "User object that needs to be added to the database."
+          description: "El usuario que debe ser creado"
           required: true
           schema:
-            $ref: "#/definitions/User"
+            $ref: "#/definitions/UserEntity"
       responses:
         201:
-          description: "User created successfully."
+          description: "Usuario creado correctamente."
           schema:
             $ref: "#/definitions/User"
         500:
@@ -251,6 +251,21 @@ definitions:
         type: "string"
       profilePictureUrl:
         type: "string"
+  UserEntity:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      last_name:
+        type: "string"
+      password:
+        type: "string"
+      email:
+        type: "string"
+      phone:
+        type: "string"
+      profile_picture:
+        type: "string"        
   FullMessage:
     type: "object"
     properties:
