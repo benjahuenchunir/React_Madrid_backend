@@ -31,7 +31,7 @@ router.post('/signup', upload.array('files'), async (ctx) => {
         if (files && files.length > 0) {
             try {
                 const file = files[0]; 
-                const result = await cloudinary.uploader.upload(file.path, { resource_type: "raw" });
+                const result = await cloudinary.uploader.upload(file.path);
                 profilePictureUrl = result.url;
                 await unlink(file.path);
             } catch (uploadError) {
