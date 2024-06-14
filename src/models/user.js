@@ -16,6 +16,7 @@ module.exports = (sequelize, DataTypes) => {
       return {
         id: this.id,
         name: this.name,
+        lastName: this.last_name,
         profilePictureUrl: this.profile_picture_url
       };
     }
