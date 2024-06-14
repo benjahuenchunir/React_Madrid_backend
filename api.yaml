@@ -16,6 +16,19 @@ tags:
     description: "Todo lo relacionado a messages"
 
 paths:
+  /:
+    get:
+      summary: "Revisa el estado de la API"
+      description: "Realiza un fetch a la raíz de la API para revisar si está funcionando correctamente."
+      responses:
+        200:
+          description: "Un mensaje de 'Hello world'"
+          schema:
+            $ref: '#/definitions/Success'
+        500:
+          description: "Internal Server Error"
+          schema:
+            $ref: '#/definitions/Error'
   /users:
     get:
       tags: ["users", ]
