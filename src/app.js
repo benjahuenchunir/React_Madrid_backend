@@ -21,7 +21,8 @@ app.use(koaBody());
 
 // API Docs
 let spec = fs.readFileSync('./api.yaml', 'utf8');
-spec = spec.replace('${DB_HOST}', process.env.DB_HOST);
+let dbHost = process.env.DB_HOST === '127.0.0.1' ? 'localhost' : process.env.DB_HOST;
+spec = spec.replace('${DB_HOST}', dbHost);
 spec = spec.replace('${PORT}', process.env.PORT);
 spec = yamljs.parse(spec);
 

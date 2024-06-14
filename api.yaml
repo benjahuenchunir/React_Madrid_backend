@@ -106,15 +106,94 @@ paths:
           schema:
             type: "array"
             items:
-              $ref: "#/definitions/Message"
+              $ref: "#/definitions/FullMessage"
         500:
           description: "Internal Server Error"
           schema:
             $ref: '#/definitions/Error'
   /messages:
-    get:
+    post:
       tags: ["messages", ]
-      summary: "List all messages"
+      summary: "Crea un mensaje nuevo"
+      description: "Crea un mensaje nuevo con los datos proporcionados."
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "El mensaje que debe ser creado"
+          required: true
+          schema:
+            $ref: "#/definitions/MessageEntity"
+      responses:
+        400:
+          description: "Faltaron parametros. Se requiere idUser, idChat y message o files"
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: "No tienes permiso para enviar mensajes en este chat"
+          schema:
+            $ref: '#/definitions/Error'
+        201:
+          description: "Mensaje creado correctamente."
+          schema:
+            $ref: "#/definitions/FullMessage"
+        500:
+          description: "Internal Server Error"
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      tags: ["messages", ]
+      summary: "Elimina un mensaje"
+      description: "Elimina un mensaje con el id proporcionado."
+      parameters:
+        - in: "query"
+          name: "id"
+          required: true
+          description: "ID del mensaje"
+          type: "integer"
+          format: "int64"
+      responses:
+        404:
+          description: "No se encontró el mensaje"
+          schema:
+            $ref: '#/definitions/Error'
+        200:
+          description: "Mensaje eliminado correctamente."
+          schema:
+            $ref: "#/definitions/Success"
+        500:
+          description: "Internal Server Error"
+          schema:
+            $ref: '#/definitions/Error'
+    patch:
+      tags: ["messages", ]
+      summary: "Edita un mensaje"
+      description: "Edita un mensaje con el id proporcionado."
+      parameters:
+        - in: "query"
+          name: "id"
+          required: true
+          description: "ID del mensaje"
+          type: "integer"
+          format: "int64"
+        - in: "body"
+          name: "body"
+          description: "El mensaje que debe ser editado"
+          required: true
+          schema:
+            $ref: "#/definitions/MessageUpdateEntity"
+      responses:
+        404:
+          description: "No se encontró el mensaje"
+          schema:
+            $ref: '#/definitions/Error'
+        200:
+          description: "Mensaje editado correctamente."
+          schema:
+            $ref: "#/definitions/FullMessage"
+        500:
+          description: "Internal Server Error"
+          schema:
+            $ref: '#/definitions/Error'
 
 responses:
   500:
@@ -128,6 +207,11 @@ definitions:
     properties:
       error:
         type: "string"
+  Success:
+    type: "object"
+    properties:
+      message:
+        type: "string"
   Chat:
     type: "object"
     properties:
@@ -137,16 +221,13 @@ definitions:
         type: "string"
       imageUrl:
         type: "string"
-      mode:
-        type: "string"
-      Users:
-        type: "array"
-        items:
-          $ref: "#/definitions/User"
-      Messages:
-        type: "array"
-        items:
-          $ref: "#/definitions/Message"
+        nullable: true
+      canSendMessage:
+        type: "boolean"
+      lastMessage:
+        $ref: "#/definitions/Message"
+      isDm: 
+        type: "boolean"
   ChatEntity:
     type: "object"
     properties:
@@ -156,6 +237,7 @@ definitions:
         type: "string"
       image_url:
         type: "string"
+        nullable: true
       mode:
         type: "string"
   User:
@@ -165,25 +247,76 @@ definitions:
         type: "integer"
       name:
         type: "string"
-      last_name:
+      lastName:
         type: "string"
-      profile_picture_url:
+      profilePictureUrl:
         type: "string"
-  Message:
+  FullMessage:
     type: "object"
     properties:
       id:
         type: "integer"
+      idChat: 
+        type: "integer"
+      idUser:
+        type: "integer"
       message:
         type: "string"
-      createdAt:
+      lastEditDate: 
         type: "string"
-      User:
+        nullable: true
+        format: "date-time"
+      deletesAt: 
+        type: "string"
+        nullable: true
+        format: "date-time"
+      forwaded:
+        type: "boolean"
+      respondingTo:
+        type: "integer"
+        nullable: true
+      time:
+        type: "string"
+        format: "date-time"
+      user:
         $ref: "#/definitions/User"
-      MessageFiles:
+      files:
         type: "array"
         items:
           $ref: "#/definitions/MessageFile"
+  Message:
+    type: "object"
+    properties:
+      message:
+        type: "string"
+      time:
+        type: "string"
+        format: "date-time"
+  MessageEntity:
+    type: "object"
+    properties:
+      idChat:
+        type: "integer"
+      idUser:
+        type: "integer"
+      message:
+        type: "string"
+      pinned:
+        type: "boolean"
+        default: false
+      deletesAt:
+        type: "string"
+        format: "date-time"
+        nullable: true
+      forwaded:
+        type: "boolean"
+      respondingTo:
+        type: "integer"
+        nullable: true
+      files:
+        type: "array"
+        items:
+          $ref: "#/definitions/File"
   MessageFile:
     type: "object"
     properties:
@@ -191,3 +324,23 @@ definitions:
         type: "integer"
       file_url:
         type: "string"
+  definitions:
+    File: # TODO revisar este modelo, es el que se usa para pasar archivos de front a back
+      type: "object"
+      properties:
+        file:
+          type: "string"
+          format: "binary"
+          description: "File to be uploaded"
+  MessageUpdateEntity:
+    type: "object"
+    properties:
+      message:
+        type: "string"
+      pinned:
+        type: "boolean"
+        default: false
+      deletesAt:
+        type: "string"
+        format: "date-time"
+        nullable: true
