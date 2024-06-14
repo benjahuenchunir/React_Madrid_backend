@@ -5,6 +5,7 @@ const fs = require('fs');
 const yamljs = require('yamljs');
 const {koaSwagger} = require('koa2-swagger-ui');
 const router = require('./routes.js');
+const bodyParser = require('koa-bodyparser');
 const orm = require('./models/index.js');
 const cors = require('@koa/cors');
 
@@ -18,6 +19,7 @@ app.use(cors());
 // Middlewares proporcionados por Koa
 app.use(Logger());
 app.use(koaBody());
+app.use(bodyParser());
 
 // API Docs
 let spec = fs.readFileSync('./api.yaml', 'utf8');
