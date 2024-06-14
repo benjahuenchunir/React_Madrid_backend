@@ -3,6 +3,8 @@ const { koaBody } = require('koa-body');
 var jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 const multer = require('@koa/multer');
+const util = require('util');
+const fs = require('fs');
 const unlink = util.promisify(fs.unlink);
 const upload = multer({ dest: 'uploads/' });
 dotenv.config();
@@ -22,6 +24,7 @@ router.post('/signup', upload.array('files'), async (ctx) => {
             ctx.body = { message: 'Email already exists' };
             return;
         }
+        
 
         
         let profilePictureUrl = null;
@@ -34,7 +37,8 @@ router.post('/signup', upload.array('files'), async (ctx) => {
             } catch (uploadError) {
                 console.log(uploadError);
                 ctx.status = 500;
-                ctx.body = { message: 'Error uploading file to Cloudinary' };
+                ctx.body = { message: 'Error uploading file to Cloudinary, the file was ' + files.path + ' ' + uploadError.message
+                };
                 return;
             }
         }
@@ -58,42 +62,42 @@ router.post('/signup', upload.array('files'), async (ctx) => {
     }
 });
 
-router.post('authentication.login', '/login', async (ctx) => {
-    let user;
-    const authInfo = ctx.request.body;
-    try {
-        user = await ctx.orm.User.findOne({ where: { email: authInfo.email } })
-    } catch (error) {
-        ctx.body = { message: error.message };
-        ctx.status = 400;
-        return;
-    }
-    if (!user) {
-        ctx.body = { message: 'User not found' };
-        ctx.status = 404;
-        return;
-    }
-    if (user.password == authInfo.password) {
-        ctx.body = { message: 'User ' + user.name + ' logged in' };
-        ctx.status = 200;
-    } else {
-        ctx.body = { message: 'Incorrect password' };
-        ctx.status = 401;
-        return;
+router.post('/login', async (ctx) => {
+    try{
+        const { email, password } = ctx.request.body;
+        let user = await User.findOne({ where: { email: email } });
+
+        if (!user) {
+            ctx.body = { message: 'User not found' };
+            ctx.status = 404;
+            return;
+        }
+        if (user.password == password) {
+            const scope = user.role;
+            const expirationSeconds = 1 * 60 * 60 * 24;
+            const JWT_PRIVATE_KEY = process.env.JWT_SECRET;
+            var token = jwt.sign(
+                {scope: scope},
+                JWT_PRIVATE_KEY,
+                {subject: user.id.toString()},
+                { expiresIn: expirationSeconds }
+            );
+    
+            ctx.body = {"token": token, "token_type": "Bearer", "expires_in": expirationSeconds, "scope": scope};
+            ctx.status = 200;
+        } else {
+            ctx.body = { message: 'Incorrect password' };
+            ctx.status = 401;
+            return;
+        }
     }
 
-    const scope = user.role;
-    const expirationSeconds = 1 * 60 * 60 * 24;
-    const JWT_PRIVATE_KEY = process.env.JWT_SECRET;
-    var token = jwt.sign(
-        {scope: scope},
-        JWT_PRIVATE_KEY,
-        {subject: user.id.toString()},
-        { expiresIn: expirationSeconds }
-    );
+    catch (error) {
 
-    ctx.body = {"token": token, "token_type": "Bearer", "expires_in": expirationSeconds, "scope": scope};
-    ctx.status = 200;
+        ctx.status = 500;
+        ctx.body = { message: "Error in login process " + error.message};
+    }
+    
 });
 
 
