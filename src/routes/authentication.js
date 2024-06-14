@@ -2,7 +2,11 @@ const Router = require('koa-router');
 const { koaBody } = require('koa-body');
 var jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
+const multer = require('@koa/multer');
+const unlink = util.promisify(fs.unlink);
+const upload = multer({ dest: 'uploads/' });
 dotenv.config();
+const cloudinary = require('./../utils/cloudinaryConfig');
 
 const router = new Router();
 
@@ -17,13 +21,17 @@ router.post('/signup', koaBody({ multipart: true }), async (ctx) => {
         return;
     }
     try {
+
+        const file = files.files; 
+        const result = await cloudinary.uploader.upload(file.path, { resource_type: 'raw' });
+
         user = await ctx.orm.User.create({
             name: authInfo.name,
             last_name: authInfo.last_name,
             password: authInfo.password,
             email: authInfo.email, 
             phone: authInfo.phone,
-            profile_picture_url: authInfo.profile_picture_url,
+            profile_picture_url: result.url,
             role: 'user'
         })
     } catch (error) {
