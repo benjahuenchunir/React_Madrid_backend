@@ -9,7 +9,7 @@ module.exports = {
       {
         name: 'Marvin',
         last_name: 'Cross',
-        password: bcrypt.hashSync('password123', 10),
+        password: bcrypt.hashSync('password123', 5),
         email: 'test1@example.com',
         phone: '1234567890',
         profile_picture_url: 'https://ui-avatars.com/api/?name=Marvin+Cross',
@@ -20,7 +20,7 @@ module.exports = {
       {
         name: 'Irene',
         last_name: 'Lucas',
-        password: bcrypt.hashSync('password123', 10),
+        password: bcrypt.hashSync('password123', 5),
         email: 'test2@example.com',
         phone: '0987654321',
         profile_picture_url: 'https://ui-avatars.com/api/?name=Irene+Lucas',
@@ -31,7 +31,7 @@ module.exports = {
       {
         name: 'Lester',
         last_name: 'Welch',
-        password: bcrypt.hashSync('password123', 10),
+        password: bcrypt.hashSync('password123', 5),
         email: 'test3@example.com',
         phone: '1122334455',
         profile_picture_url: 'https://ui-avatars.com/api/?name=Lester+Welch',
