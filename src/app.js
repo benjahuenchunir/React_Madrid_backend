@@ -19,14 +19,14 @@ app.use(cors());
 app.use(Logger());
 app.use(koaBody());
 
-// .load loads file from root.
+// API Docs
 let spec = fs.readFileSync('./api.yaml', 'utf8');
 spec = spec.replace('${DB_HOST}', process.env.DB_HOST);
 spec = spec.replace('${PORT}', process.env.PORT);
 spec = yamljs.parse(spec);
 
 app.use(koaSwagger({
-    routePrefix: '/swagger',
+    routePrefix: '/docs',
     swaggerOptions: { spec },
   })
 )

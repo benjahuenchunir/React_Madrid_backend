@@ -2,18 +2,18 @@ swagger: "2.0"
 info:
   title: "DeepSpace Docs"
   description: >
-    Docs for DeepSpace API.
+    Docs de DeepSpace API.
   version: "1.0.0"
 host: "${DB_HOST}:${PORT}"
 schemes:
   - "http"
 tags:
   - name: "users"
-    description: "Operations about users"
+    description: "Todo lo relacionado a users"
   - name: "chats"
-    description: "Operations about chats"
+    description: "Todo lo relacionado a chats"
   - name: "messages"
-    description: "Operations about messages"
+    description: "Todo lo relacionado a messages"
 
 paths:
   /users:
@@ -55,7 +55,62 @@ paths:
   /chats:
     get:
       tags: ["chats", ]
-      summary: "List all chats"
+      summary: "Recupera los chats de un usuario"
+      parameters:
+      - in: "query"
+        name: "userId"
+        required: true
+        description: "ID del usuario"
+        type: "integer"
+        format: "int64"
+      responses:
+        200:
+          description: "Una lista de chats"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Chat"
+        500:
+          description: "Internal Server Error"
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      tags: ["chats", ]
+      summary: "Crea un nuevo chat"
+      description: "Crea un nuevo chat con los datos proporcionados."
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "El chat que debe ser creado"
+          required: true
+          schema:
+            $ref: "#/definitions/ChatEntity"
+  /chats/{id}:
+    get:
+      tags: ["chats"]
+      summary: "Recupera los mensajes de un chat"
+      parameters:
+        - in: "path"
+          name: "id"
+          required: true
+          description: "ID del chat"
+          type: "integer"
+          format: "int64"
+      responses:
+        404:
+          description: "No se encontraró el chat"
+          schema:
+            $ref: '#/definitions/Error'
+        200:
+          description: "Una lista de mensajes de un chat"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Message"
+        500:
+          description: "Internal Server Error"
+          schema:
+            $ref: '#/definitions/Error'
   /messages:
     get:
       tags: ["messages", ]
@@ -66,3 +121,73 @@ responses:
     description: Internal Server Error
     schema:
       $ref: '#/definitions/Error'
+
+definitions:
+  Error:
+    type: "object"
+    properties:
+      error:
+        type: "string"
+  Chat:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+      name:
+        type: "string"
+      imageUrl:
+        type: "string"
+      mode:
+        type: "string"
+      Users:
+        type: "array"
+        items:
+          $ref: "#/definitions/User"
+      Messages:
+        type: "array"
+        items:
+          $ref: "#/definitions/Message"
+  ChatEntity:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+      name:
+        type: "string"
+      image_url:
+        type: "string"
+      mode:
+        type: "string"
+  User:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+      name:
+        type: "string"
+      last_name:
+        type: "string"
+      profile_picture_url:
+        type: "string"
+  Message:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+      message:
+        type: "string"
+      createdAt:
+        type: "string"
+      User:
+        $ref: "#/definitions/User"
+      MessageFiles:
+        type: "array"
+        items:
+          $ref: "#/definitions/MessageFile"
+  MessageFile:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+      file_url:
+        type: "string"
