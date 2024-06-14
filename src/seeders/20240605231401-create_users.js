@@ -42,7 +42,7 @@ module.exports = {
       {
         name: 'Admin',
         last_name: 'Admin',
-        password: bcrypt.hashSync('password123', 10),
+        password: bcrypt.hashSync('password123', 5),
         email: 'admin@example.com',
         phone: '5432167890',
         profile_picture_url: 'https://ui-avatars.com/api/?name=Admin+Admin',
