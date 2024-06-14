@@ -10,6 +10,8 @@ const upload = multer({ dest: 'uploads/' });
 dotenv.config();
 const cloudinary = require('./../utils/cloudinaryConfig');
 const { User } = require('../models');
+const bcrypt = require('bcrypt');
+
 
 const router = new Router();
 
@@ -42,15 +44,26 @@ router.post('/signup', upload.array('files'), async (ctx) => {
                 return;
             }
         }
-        user = await User.create({
-            name,
-            last_name,
-            email,
-            password,
-            phone,
-            profile_picture_url: profilePictureUrl,
-            role: 'user'
-        });
+        try{
+
+            const saltRounds = 5;
+            const hashPassword = await bcrypt.hash(password, saltRounds);
+            user = await User.create({
+                name,
+                last_name,
+                email,
+                password: hashPassword,
+                phone,
+                profile_picture_url: profilePictureUrl,
+                role: 'user'
+            });
+        }
+
+        catch (error) {
+            ctx.status = 500;
+            ctx.body = { message: "Error creating user " + error.message};
+            return;
+        }
 
         ctx.status = 201;
         ctx.body = { message: `User of name ${user.name} and email ${user.email} created` };
@@ -75,7 +88,10 @@ router.post('/login', koaBody({ multipart: true }), async (ctx) => {
             ctx.status = 404;
             return;
         }
-        if (user.password == password) {
+
+        const validPassword = await bcrypt.compare(password, user.password);
+
+        if (validPassword) {
             const scope = user.role;
             const expirationSeconds = 1 * 60 * 60 * 24;
             const JWT_PRIVATE_KEY = process.env.JWT_SECRET;
