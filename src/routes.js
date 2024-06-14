@@ -4,14 +4,12 @@ const chats = require('./routes/chats');
 const messages = require('./routes/messages');
 const auth = require('./routes/authentication');
 const jwtMiddleware = require('koa-jwt');
-const dotenv = require('dotenv');
 
 const router = new Router();
 
 
 router.use('/chats', chats.routes());
 router.use('/messages', messages.routes());
-router.use('/chats', chats.routes());
 router.use('/auth', auth.routes());
 router.use('/users', users.routes());
 

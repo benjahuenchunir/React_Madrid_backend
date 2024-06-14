@@ -34,12 +34,6 @@ app.use(koaSwagger({
   })
 )
 
-app.use(koaSwagger({ // TODO delete after testing
-    routePrefix: '/swagger-example',
-    swaggerOptions: { url: 'http://petstore.swagger.io/v2/swagger.json'  },
-  })
-)
-
 // koa router
 app.use(router.routes());
 
