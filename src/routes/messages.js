@@ -41,7 +41,7 @@ router.post('/', upload.array('files'), async (ctx) => {
 
         // Create message files
         if (files && files.length > 0) {
-            await Promise.all(files.forEach(async (file) => {
+            await Promise.all(files.map(async (file) => {
                 const result = await cloudinary.uploader.upload(file.path, { resource_type: "raw" });
                 await MessageFile.create({
                     id_message: newMessage.id,
