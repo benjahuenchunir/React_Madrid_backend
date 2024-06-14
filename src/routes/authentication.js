@@ -1,12 +1,15 @@
 const Router = require('koa-router');
+const { koaBody } = require('koa-body');
 var jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 dotenv.config();
 
 const router = new Router();
 
-router.post('authentication.signup', '/signup', async (ctx) => {
-    const authInfo = ctx.request.body;
+router.post('/auth/signup', koaBody({ multipart: true }), async (ctx) => {
+    const { body, files } = ctx.request;
+    const authInfo = body;
+    console.log(body);
     let user = await ctx.orm.User.findOne({ where: { email: authInfo.email } })
     if (user) {
         ctx.body = { message: 'Email already exists' };

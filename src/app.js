@@ -2,6 +2,7 @@ const Koa = require('koa');
 const Logger = require('koa-logger');
 const { koaBody } = require('koa-body');
 const router = require('./routes.js');
+const bodyParser = require('koa-bodyparser');
 const orm = require('./models/index.js');
 const cors = require('@koa/cors');
 
@@ -15,6 +16,7 @@ app.use(cors());
 // Middlewares proporcionados por Koa
 app.use(Logger());
 app.use(koaBody());
+app.use(bodyParser());
 
 // koa router
 app.use(router.routes());
