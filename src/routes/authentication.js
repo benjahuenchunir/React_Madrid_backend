@@ -6,7 +6,7 @@ dotenv.config();
 
 const router = new Router();
 
-router.post('/auth/signup', koaBody({ multipart: true }), async (ctx) => {
+router.post('/signup', koaBody({ multipart: true }), async (ctx) => {
     const { body, files } = ctx.request;
     const authInfo = body;
     console.log(body);
