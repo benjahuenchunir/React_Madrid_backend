@@ -8,6 +8,8 @@ host: "${DB_HOST}:${PORT}"
 schemes:
   - "http"
 tags:
+  - name: "auth"
+    description: "Todo lo relacionado a autenticación"
   - name: "users"
     description: "Todo lo relacionado a users"
   - name: "chats"
@@ -25,6 +27,83 @@ paths:
           description: "Un mensaje de 'Hello world'"
           schema:
             $ref: '#/definitions/Success'
+        500:
+          description: "Internal Server Error"
+          schema:
+            $ref: '#/definitions/Error'
+  /auth/login:
+    post:
+      tags: ["auth", ]
+      summary: "Inicia sesión"
+      description: "Inicia sesión con los datos proporcionados."
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "El usuario que debe iniciar sesión"
+          required: true
+          schema:
+            type: "object"
+            properties:
+              email:
+                type: "string"
+                format: "email"
+              password:
+                type: "string"
+            required:
+              - email
+              - password
+      responses:
+        404:
+          description: "No se encontró el usuario"
+          schema:
+            $ref: '#/definitions/Error'
+        401:
+          description: "Credenciales incorrectas"
+          schema:
+            $ref: '#/definitions/Error'
+        200:
+          description: "Login exitoso"
+          schema:
+            type: "object"
+            properties:
+              token:
+                type: "string"
+              token_type:
+                type: "string"
+              expires_in:
+                type: "integer"
+              scope:
+                type: "string"
+            required:
+              - token
+              - token_type
+              - expires_in
+              - scope
+        500:
+          description: "Internal Server Error"
+          schema:
+            $ref: '#/definitions/Error'
+  /auth/signup:
+    post:
+      tags: ["auth", ]
+      summary: "Registra un nuevo usuario"
+      description: "Registra un nuevo usuario con los datos proporcionados."
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "El usuario que debe ser registrado"
+          required: true
+          schema:
+            $ref: "#/definitions/UserEntity"
+      responses:
+        400:
+          description: "Ya existe un usuario con ese email"
+          schema:
+            $ref: '#/definitions/Error'
+        201:
+          description: "Usuario registrado correctamente."
+          schema:
+            $ref: "#/definitions/Success"
         500:
           description: "Internal Server Error"
           schema:
