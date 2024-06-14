@@ -62,9 +62,12 @@ router.post('/signup', upload.array('files'), async (ctx) => {
     }
 });
 
-router.post('/login', async (ctx) => {
+
+router.post('/login', koaBody({ multipart: true }), async (ctx) => {
     try{
-        const { email, password } = ctx.request.body;
+        const { body } = ctx.request;
+        const { email, password } = body;
+        console.log(body);
         let user = await User.findOne({ where: { email: email } });
 
         if (!user) {
