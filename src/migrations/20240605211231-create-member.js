@@ -11,7 +11,8 @@ module.exports = {
         references: {
           model: 'Chats',
           key: 'id'
-        }
+        },
+        onDelete: 'CASCADE',
       },
       id_user: {
         type: Sequelize.INTEGER,
@@ -21,7 +22,8 @@ module.exports = {
         references: {
           model: 'Users',
           key: 'id'
-        }
+        },
+        onDelete: 'CASCADE',
       },
       role: {
         type: Sequelize.ENUM("admin", "member", "owner"),

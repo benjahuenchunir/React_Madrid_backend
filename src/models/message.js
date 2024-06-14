@@ -26,6 +26,12 @@ module.exports = (sequelize, DataTypes) => {
         time: this.createdAt,
       };
     }
+
+    async getFullMessage() {
+      const user = await this.getUser({ attributes: ['id', 'name', 'profile_picture_url'] });
+      const messageFiles = await this.getMessageFiles();
+      return { ...this.toDomain(), user: user.toDomain(), files: messageFiles.map(file => file.toDomain()) };
+    }
   }
 
   Message.init({
@@ -43,6 +49,20 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'Message',
+    hooks: {
+      afterCreate: async (message) => {
+        const chat = await message.getChat();
+        const members = await chat.getMembers();
+        const otherMembers = members.filter(member => member.id_user !== message.id_user);
+
+        const messageStatuses = otherMembers.map(member => ({
+          id_message: message.id,
+          id_user: member.id_user
+        }));
+
+        await sequelize.models.MessageStatus.bulkCreate(messageStatuses);
+      }
+    }
   });
   return Message;
 };

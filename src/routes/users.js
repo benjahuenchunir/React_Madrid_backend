@@ -13,4 +13,15 @@ router.get('/', async (ctx) => {
     }
 });
 
+router.post('/', async (ctx) => {
+    try {
+        const newUser = await User.create(ctx.request.body);
+        ctx.status = 201;
+        ctx.body = newUser;
+    } catch (error) {
+        ctx.status = 500;
+        ctx.body = { error: error.message };
+    }
+});
+
 module.exports = router;

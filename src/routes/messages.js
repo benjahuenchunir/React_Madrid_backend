@@ -1,5 +1,5 @@
 const Router = require('koa-router');
-const { Message, Member, MessageStatus, User, MessageFile } = require('../models');
+const { Message, MessageFile } = require('../models');
 const router = new Router();
 const cloudinary = require('./../utils/cloudinaryConfig');
 const multer = require('@koa/multer');
@@ -37,23 +37,11 @@ router.post('/', upload.array('files'), async (ctx) => {
             deletes_at: deletesAt || null,
             forwarded: forwarded,
             responding_to: respondingTo || null
-        });
-
-        // Create message statuses for all chat members except the sender
-        const members = await Member.findAll({ where: { id_chat: idChat } });
-        const messageStatuses = await Promise.all(
-            members
-                .filter(member => member.id_user !== idUser)
-                .map(member => MessageStatus.create({
-                    id_user: member.id_user,
-                    id_message: newMessage.id
-                }))
-        ); // TODO send statuses
+        });        
 
         // Create message files
-        let messageFiles = [];
         if (files && files.length > 0) {
-            messageFiles = await Promise.all(files.map(async (file) => {
+            await Promise.all(files.map(async (file) => {
                 const result = await cloudinary.uploader.upload(file.path, { resource_type: "raw" });
                 const messageFile = await MessageFile.create({
                     id_message: newMessage.id,
@@ -66,10 +54,77 @@ router.post('/', upload.array('files'), async (ctx) => {
             }));
         }
 
-        const user = await User.findOne({ where: { id: idUser }, attributes: ['id', 'name', 'profile_picture_url'] });
-
         ctx.status = 201;
-        ctx.body = { ...newMessage.toDomain(), user: user.toDomain(), files: messageFiles };
+        ctx.body = await newMessage.getFullMessage();
+    } catch (error) {
+        console.log(error);
+        ctx.status = 500;
+        ctx.body = { error: error.message };
+    }
+});
+
+router.patch('/:id', async (ctx) => {
+    try {
+        const { id } = ctx.params;
+        const { message, pinned, deletesAt } = ctx.request.body;
+
+        if (!id) {
+            ctx.status = 400;
+            ctx.body = { error: 'Se requiere la id del mensaje' };
+            return;
+        }
+
+        const updateData = {};
+        if (message !== undefined) {
+            updateData.message = message;
+            updateData.last_edit_date = new Date();
+        }
+        if (pinned !== undefined) updateData.pinned = pinned;
+        if (deletesAt !== undefined) updateData.deletes_at = deletesAt;
+
+        const [updatedRows] = await Message.update(updateData, {
+            where: { id: id }
+        });
+
+        if (updatedRows === 0) {
+            ctx.status = 404;
+            ctx.body = { error: 'No se encontró un mensaje con esa id' };
+            return;
+        }
+
+        const updatedMessage = await Message.findOne({ where: { id: id } });
+
+        ctx.status = 200;
+        ctx.body = await updatedMessage.getFullMessage();
+    } catch (error) {
+        console.log(error);
+        ctx.status = 500;
+        ctx.body = { error: error.message };
+    }
+});
+
+router.delete('/:id', async (ctx) => {
+    try {
+        const { id } = ctx.params;
+
+        if (!id) {
+            ctx.status = 400;
+            ctx.body = { error: 'Se requiere la id del mensaje' };
+            return;
+        }
+
+        const deletedRows = await Message.destroy({
+            where: { id: id }
+        });
+
+        if (deletedRows === 0) {
+            ctx.status = 404;
+            ctx.body = { error: 'No se encontró un mensaje con esa id' };
+            return;
+        }
+
+        ctx.status = 200;
+        ctx.body = { message: 'Mensaje eliminado con éxito' };
     } catch (error) {
         console.log(error);
         ctx.status = 500;

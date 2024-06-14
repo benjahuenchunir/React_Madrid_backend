@@ -15,7 +15,8 @@ module.exports = {
         references: {
           model: 'Chats',
           key: 'id'
-        }
+        },
+        onDelete: 'CASCADE',
       },
       id_user: {
         type: Sequelize.INTEGER,
@@ -23,7 +24,8 @@ module.exports = {
         references: {
           model: 'Users',
           key: 'id'
-        }
+        },
+        onDelete: 'CASCADE',
       },
       message: {
         type: Sequelize.STRING

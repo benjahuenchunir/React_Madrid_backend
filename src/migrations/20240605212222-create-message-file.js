@@ -15,7 +15,8 @@ module.exports = {
         references: {
           model: 'Messages',
           key: 'id'
-        }
+        },
+        onDelete: 'CASCADE',
       },
       name: {
         type: Sequelize.STRING,
