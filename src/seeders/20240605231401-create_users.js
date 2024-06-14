@@ -1,5 +1,7 @@
 'use strict';
 
+const bcrypt = require('bcrypt');
+
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface) {
@@ -7,7 +9,7 @@ module.exports = {
       {
         name: 'Marvin',
         last_name: 'Cross',
-        password: 'password',
+        password: bcrypt.hashSync('password123', 10),
         email: 'test1@example.com',
         phone: '1234567890',
         profile_picture_url: 'https://ui-avatars.com/api/?name=Marvin+Cross',
@@ -18,7 +20,7 @@ module.exports = {
       {
         name: 'Irene',
         last_name: 'Lucas',
-        password: 'password',
+        password: bcrypt.hashSync('password123', 10),
         email: 'test2@example.com',
         phone: '0987654321',
         profile_picture_url: 'https://ui-avatars.com/api/?name=Irene+Lucas',
@@ -29,7 +31,7 @@ module.exports = {
       {
         name: 'Lester',
         last_name: 'Welch',
-        password: 'password',
+        password: bcrypt.hashSync('password123', 10),
         email: 'test3@example.com',
         phone: '1122334455',
         profile_picture_url: 'https://ui-avatars.com/api/?name=Lester+Welch',
@@ -40,7 +42,7 @@ module.exports = {
       {
         name: 'Admin',
         last_name: 'Admin',
-        password: 'password',
+        password: bcrypt.hashSync('password123', 10),
         email: 'admin@example.com',
         phone: '5432167890',
         profile_picture_url: 'https://ui-avatars.com/api/?name=Admin+Admin',
