@@ -98,8 +98,7 @@ router.post('/login', koaBody({ multipart: true }), async (ctx) => {
             var token = jwt.sign(
                 {scope: scope},
                 JWT_PRIVATE_KEY,
-                {subject: user.id.toString()},
-                { expiresIn: expirationSeconds }
+                {subject: user.id.toString(), expiresIn: expirationSeconds }
             );
     
             ctx.body = {"token": token, "token_type": "Bearer", "expires_in": expirationSeconds, "scope": scope};
