@@ -1,5 +1,4 @@
 const Router = require('koa-router');
-const { koaBody } = require('koa-body');
 var jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 const multer = require('@koa/multer');
@@ -15,10 +14,10 @@ const bcrypt = require('bcrypt');
 
 const router = new Router();
 
-router.post('/signup', upload.array('files'), async (ctx) => {
+router.post('/signup', upload.single('file'), async (ctx) => {
     try {
         const { name, last_name, email, password, phone } = ctx.request.body;
-        const files = ctx.request.files;
+        const file = ctx.request.file;
 
         let user = await User.findOne({ where: { email } });
         if (user) {
@@ -26,26 +25,23 @@ router.post('/signup', upload.array('files'), async (ctx) => {
             ctx.body = { message: 'Email already exists' };
             return;
         }
-        
 
-        
         let profilePictureUrl = null;
-        if (files && files.length > 0) {
+        if (file) {
             try {
-                const file = files[0]; 
                 const result = await cloudinary.uploader.upload(file.path);
                 profilePictureUrl = result.url;
                 await unlink(file.path);
             } catch (uploadError) {
                 console.log(uploadError);
                 ctx.status = 500;
-                ctx.body = { message: 'Error uploading file to Cloudinary, the file was ' + files.path + ' ' + uploadError.message
+                ctx.body = { message: 'Error uploading file to Cloudinary, the file was ' + file.path + ' ' + uploadError.message
                 };
                 return;
             }
         }
-        try{
 
+        try {
             const saltRounds = 5;
             const hashPassword = await bcrypt.hash(password, saltRounds);
             user = await User.create({
@@ -57,9 +53,7 @@ router.post('/signup', upload.array('files'), async (ctx) => {
                 profile_picture_url: profilePictureUrl,
                 role: 'user'
             });
-        }
-
-        catch (error) {
+        } catch (error) {
             ctx.status = 500;
             ctx.body = { message: "Error creating user " + error.message};
             return;
@@ -76,11 +70,11 @@ router.post('/signup', upload.array('files'), async (ctx) => {
 });
 
 
-router.post('/login', koaBody({ multipart: true }), async (ctx) => {
+router.post('/login', async (ctx) => {
     try{
-        const { body } = ctx.request;
-        const { email, password } = body;
-        console.log(body);
+        const { email, password } = ctx.request.body;
+        console.log(email)
+        console.log("aaaaaaa")
         let user = await User.findOne({ where: { email: email } });
 
         if (!user) {
@@ -98,8 +92,8 @@ router.post('/login', koaBody({ multipart: true }), async (ctx) => {
             var token = jwt.sign(
                 {scope: scope},
                 JWT_PRIVATE_KEY,
-                {subject: user.id.toString()},
-                { expiresIn: expirationSeconds }
+                {subject: user.id.toString(),
+                 expiresIn: expirationSeconds }
             );
     
             ctx.body = {"token": token, "token_type": "Bearer", "expires_in": expirationSeconds, "scope": scope};
