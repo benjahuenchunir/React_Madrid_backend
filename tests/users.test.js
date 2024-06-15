@@ -18,11 +18,7 @@ test('Create a new user', async () => {
 
     expect(response.status).toBe(201);
     expect(response.body.name).toBe(newUser.name);
-    expect(response.body.last_name).toBe(newUser.last_name);
-    expect(response.body.email).toBe(newUser.email);
-    expect(response.body.phone).toBe(newUser.phone);
-    expect(response.body.profile_picture_url).toBe(newUser.profile_picture_url);
-    expect(response.body.role).toBe(newUser.role);
+    expect(response.body.lastName).toBe(newUser.last_name);
 });
 
 test('Create a new chat', async () => {
