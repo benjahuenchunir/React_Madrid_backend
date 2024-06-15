@@ -1,5 +1,17 @@
 const Router = require('koa-router');
+var jwt = require('jsonwebtoken');
+const dotenv = require('dotenv');
+const multer = require('@koa/multer');
+const util = require('util');
+const fs = require('fs');
+const unlink = util.promisify(fs.unlink);
+const upload = multer({ dest: 'uploads/' });
+dotenv.config();
+const cloudinary = require('./../utils/cloudinaryConfig');
 const { User } = require('../models');
+const bcrypt = require('bcrypt');
+
+
 const router = new Router();
 
 router.get('/', async (ctx) => {
@@ -42,6 +54,8 @@ router.post('/', async (ctx) => {
 
 router.patch('/edit', upload.single('file'), async (ctx) => {
     try {
+        console.log("Here");
+        // TODO Identify via id -> get id from email
         const { name, last_name, email, password, phone } = ctx.request.body;
         const file = ctx.request.file;
 
