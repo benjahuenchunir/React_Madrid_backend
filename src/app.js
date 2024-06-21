@@ -1,15 +1,16 @@
 const Koa = require('koa');
+const websockify = require('koa-websocket');
 const Logger = require('koa-logger');
 const { koaBody } = require('koa-body');
 const fs = require('fs');
 const yamljs = require('yamljs');
 const {koaSwagger} = require('koa2-swagger-ui');
-const router = require('./routes.js');
+const { router, ws_router } = require('./routes.js');
 const bodyParser = require('koa-bodyparser');
 const orm = require('./models/index.js');
 const cors = require('@koa/cors');
 
-const app = new Koa();
+const app = websockify(new Koa());
 
 app.context.orm = orm;
 
@@ -35,10 +36,7 @@ app.use(koaSwagger({
 )
 
 // koa router
-app.use(router.routes());
-
-app.use((ctx) => {
-    ctx.body = 'Hello world';
-});
+app.use(router.routes()).use(router.allowedMethods());
+app.ws.use(ws_router.routes()).use(ws_router.allowedMethods());
 
 module.exports = app;

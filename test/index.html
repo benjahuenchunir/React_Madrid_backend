@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Test</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Replace 'ws://localhost:3000/socket' with your actual WebSocket server URL
+            const wsUrl = 'ws://localhost:3000/chats/1/messages';
+            const ws = new WebSocket(wsUrl);
+
+            ws.onopen = function() {
+                console.log('WebSocket connection established');
+                ws.send('Hello Server!');
+            };
+
+            ws.onmessage = function(event) {
+                console.log('Message from server:', event.data);
+            };
+
+            ws.onerror = function(error) {
+                console.error('WebSocket error:', error);
+            };
+
+            ws.onclose = function(event) {
+                console.log('WebSocket connection closed', event);
+            };
+
+            // Example of sending a message to the server every 5 seconds
+            setInterval(() => {
+                if (ws.readyState === WebSocket.OPEN) {
+                    ws.send('Ping');
+                }
+            }, 5000);
+        });
+    </script>
+</head>
+<body>
+    <h1>WebSocket Test</h1>
+    <p>Open the console to see the WebSocket communication.</p>
+</body>
+</html>
