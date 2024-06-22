@@ -18,6 +18,8 @@ router.use('/users', users.routes());
 router.use('/messages', messages.routes());
 const { getUserIdFromToken, getTokenFromParam } = require('./utils/permissions');
 
+
+// Websocket routes
 const ws_router = new Router();
 
 ws_router.get('/chats/:id/messages', async (ctx) => {
