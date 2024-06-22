@@ -7,17 +7,19 @@ const upload = multer({ dest: 'uploads/' });
 const fs = require('fs');
 const util = require('util');
 const unlink = util.promisify(fs.unlink);
-const canSendMessage = require('../utils/permissions');
+const { canSendMessage, getUserIdFromToken } = require('../utils/permissions');
 
 router.post('/', upload.array('files'), async (ctx) => {
     try {
-        const { idUser, idChat, message, pinned, deletesAt, forwarded, respondingTo } = ctx.request.body;
+        const idUser = getUserIdFromToken(ctx);
+
+        const { idChat, message, pinned, deletesAt, forwarded, respondingTo } = ctx.request.body;
         const files = ctx.request.files;
 
         // Validate params
-        if (!idUser || !idChat || (!message && (!files || files.length === 0))) {
+        if (!idChat || (!message && (!files || files.length === 0))) {
             ctx.status = 400;
-            ctx.body = { error: 'Se requiere idUser, idChat y message o files' };
+            ctx.body = { error: 'Se requiere, idChat y message o files' };
             return;
         }
 
@@ -73,6 +75,20 @@ router.patch('/:id', async (ctx) => {
             return;
         }
 
+        const messageEntity = await Message.findOne({ where: { id: id } });
+        if (!messageEntity) {
+            ctx.status = 404;
+            ctx.body = { error: 'No se encontró un mensaje con esa id' };
+            return;
+        }
+
+        const idUser = getUserIdFromToken(ctx);
+        if (!canSendMessage(idUser, messageEntity.id_chat)) {
+            ctx.status = 403;
+            ctx.body = { error: 'No tienes permiso para editar este mensaje' };
+            return;
+        }
+
         const updateData = {};
         if (message !== undefined) {
             updateData.message = message;
@@ -81,15 +97,9 @@ router.patch('/:id', async (ctx) => {
         if (pinned !== undefined) updateData.pinned = pinned;
         if (deletesAt !== undefined) updateData.deletes_at = deletesAt;
 
-        const [updatedRows] = await Message.update(updateData, {
+        await Message.update(updateData, {
             where: { id: id }
         });
-
-        if (updatedRows === 0) {
-            ctx.status = 404;
-            ctx.body = { error: 'No se encontró un mensaje con esa id' };
-            return;
-        }
 
         const updatedMessage = await Message.findOne({ where: { id: id } });
 
@@ -112,15 +122,22 @@ router.delete('/:id', async (ctx) => {
             return;
         }
 
-        const deletedRows = await Message.destroy({
-            where: { id: id }
-        });
+        const message = await Message.findOne({ where: { id: id } });
 
-        if (deletedRows === 0) {
+        if (!message) {
             ctx.status = 404;
             ctx.body = { error: 'No se encontró un mensaje con esa id' };
             return;
         }
+
+        const idUser = getUserIdFromToken(ctx);
+        if (!canSendMessage(idUser, message.id_chat)) {
+            ctx.status = 403;
+            ctx.body = { error: 'No tienes permiso para eliminar este mensaje' };
+            return;
+        }
+
+        await Message.destroy({ where: { id: id } });
 
         ctx.status = 200;
         ctx.body = { message: 'Mensaje eliminado con éxito' };

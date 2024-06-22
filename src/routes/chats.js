@@ -1,7 +1,7 @@
 const Router = require('koa-router');
 const { Chat, User, Message, MessageFile } = require('../models');
 const router = new Router();
-const canSendMessage = require('../utils/permissions');
+const { canSendMessage } = require('../utils/permissions');
 
 function transformChat(chat, userId) {
     let modifiedChat = { ...chat.toJSON() };

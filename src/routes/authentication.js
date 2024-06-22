@@ -73,8 +73,6 @@ router.post('/signup', upload.single('file'), async (ctx) => {
 router.post('/login', async (ctx) => {
     try{
         const { email, password } = ctx.request.body;
-        console.log(email)
-        console.log("aaaaaaa")
         let user = await User.findOne({ where: { email: email } });
 
         if (!user) {
