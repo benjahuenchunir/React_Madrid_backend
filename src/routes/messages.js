@@ -7,26 +7,7 @@ const upload = multer({ dest: 'uploads/' });
 const fs = require('fs');
 const util = require('util');
 const unlink = util.promisify(fs.unlink);
-const canSendMessage = require('../utils/permissions');
-const jwt = require('jsonwebtoken');
-
-function getTokenFromHeader(ctx) {
-    const authHeader = ctx.request.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        throw new Error('No token provided');
-    }
-    return authHeader.split(' ')[1];
-}
-
-function getUserIdFromToken(ctx) {
-    const token = getTokenFromHeader(ctx);
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        return Number(decoded.sub);
-    } catch (error) {
-        throw new Error('Invalid token');
-    }
-}
+const { canSendMessage, getUserIdFromToken } = require('../utils/permissions');
 
 router.post('/', upload.array('files'), async (ctx) => {
     try {
