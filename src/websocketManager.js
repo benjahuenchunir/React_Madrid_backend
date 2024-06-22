@@ -22,7 +22,6 @@ class WebSocketManager {
   }
 
   broadcast(message) {
-    console.log(message)
     if (this.connections.has(message.idChat)) {
       const chatConnections = this.connections.get(message.idChat);
       for (let ws of chatConnections) {
@@ -30,8 +29,6 @@ class WebSocketManager {
           ws.send(JSON.stringify(message));
         }
       }
-    } else {
-        console.log("Not Sending")
     }
   }
 }

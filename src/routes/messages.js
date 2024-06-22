@@ -8,16 +8,37 @@ const fs = require('fs');
 const util = require('util');
 const unlink = util.promisify(fs.unlink);
 const canSendMessage = require('../utils/permissions');
+const jwt = require('jsonwebtoken');
+
+function getTokenFromHeader(ctx) {
+    const authHeader = ctx.request.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        throw new Error('No token provided');
+    }
+    return authHeader.split(' ')[1];
+}
+
+function getUserIdFromToken(ctx) {
+    const token = getTokenFromHeader(ctx);
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        return Number(decoded.sub);
+    } catch (error) {
+        throw new Error('Invalid token');
+    }
+}
 
 router.post('/', upload.array('files'), async (ctx) => {
     try {
-        const { idUser, idChat, message, pinned, deletesAt, forwarded, respondingTo } = ctx.request.body;
+        const idUser = getUserIdFromToken(ctx);
+
+        const { idChat, message, pinned, deletesAt, forwarded, respondingTo } = ctx.request.body;
         const files = ctx.request.files;
 
         // Validate params
-        if (!idUser || !idChat || (!message && (!files || files.length === 0))) {
+        if (!idChat || (!message && (!files || files.length === 0))) {
             ctx.status = 400;
-            ctx.body = { error: 'Se requiere idUser, idChat y message o files' };
+            ctx.body = { error: 'Se requiere, idChat y message o files' };
             return;
         }
 
