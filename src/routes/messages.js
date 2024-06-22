@@ -75,6 +75,20 @@ router.patch('/:id', async (ctx) => {
             return;
         }
 
+        const messageEntity = await Message.findOne({ where: { id: id } });
+        if (!messageEntity) {
+            ctx.status = 404;
+            ctx.body = { error: 'No se encontró un mensaje con esa id' };
+            return;
+        }
+
+        const idUser = getUserIdFromToken(ctx);
+        if (!canSendMessage(idUser, messageEntity.id_chat)) {
+            ctx.status = 403;
+            ctx.body = { error: 'No tienes permiso para editar este mensaje' };
+            return;
+        }
+
         const updateData = {};
         if (message !== undefined) {
             updateData.message = message;
@@ -83,15 +97,9 @@ router.patch('/:id', async (ctx) => {
         if (pinned !== undefined) updateData.pinned = pinned;
         if (deletesAt !== undefined) updateData.deletes_at = deletesAt;
 
-        const [updatedRows] = await Message.update(updateData, {
+        await Message.update(updateData, {
             where: { id: id }
         });
-
-        if (updatedRows === 0) {
-            ctx.status = 404;
-            ctx.body = { error: 'No se encontró un mensaje con esa id' };
-            return;
-        }
 
         const updatedMessage = await Message.findOne({ where: { id: id } });
 
@@ -114,15 +122,22 @@ router.delete('/:id', async (ctx) => {
             return;
         }
 
-        const deletedRows = await Message.destroy({
-            where: { id: id }
-        });
+        const message = await Message.findOne({ where: { id: id } });
 
-        if (deletedRows === 0) {
+        if (!message) {
             ctx.status = 404;
             ctx.body = { error: 'No se encontró un mensaje con esa id' };
             return;
         }
+
+        const idUser = getUserIdFromToken(ctx);
+        if (!canSendMessage(idUser, message.id_chat)) {
+            ctx.status = 403;
+            ctx.body = { error: 'No tienes permiso para eliminar este mensaje' };
+            return;
+        }
+
+        await Message.destroy({ where: { id: id } });
 
         ctx.status = 200;
         ctx.body = { message: 'Mensaje eliminado con éxito' };
