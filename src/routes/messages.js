@@ -97,14 +97,10 @@ router.patch('/:id', async (ctx) => {
         if (pinned !== undefined) updateData.pinned = pinned;
         if (deletesAt !== undefined) updateData.deletes_at = deletesAt;
 
-        await Message.update(updateData, {
-            where: { id: id }
-        });
-
-        const updatedMessage = await Message.findOne({ where: { id: id } });
+        messageEntity.update(updateData);
 
         ctx.status = 200;
-        ctx.body = await updatedMessage.getFullMessage();
+        ctx.body = await messageEntity.getFullMessage();
     } catch (error) {
         console.log(error);
         ctx.status = 500;
@@ -137,7 +133,7 @@ router.delete('/:id', async (ctx) => {
             return;
         }
 
-        await Message.destroy({ where: { id: id } });
+        message.destroy();
 
         ctx.status = 200;
         ctx.body = { message: 'Mensaje eliminado con éxito' };

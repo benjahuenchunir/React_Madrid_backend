@@ -21,12 +21,15 @@ class WebSocketManager {
     }
   }
 
-  broadcast(message) {
+  broadcast(message, changeType) {
     if (this.connections.has(message.idChat)) {
       const chatConnections = this.connections.get(message.idChat);
       for (let ws of chatConnections) {
         if (ws.readyState === ws.OPEN && ws.idUser !== message.user.id) {
-          ws.send(JSON.stringify(message));
+          ws.send(JSON.stringify({
+            changeType: changeType,
+            message: message
+          }));
         }
       }
     }

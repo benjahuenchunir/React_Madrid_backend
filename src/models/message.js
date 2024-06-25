@@ -67,10 +67,28 @@ module.exports = (sequelize, DataTypes) => {
         
         // Broadcast the new message to all connected WebSocket clients
         wsManager.broadcast(
-          await message.getFullMessage()
+          await message.getFullMessage(), ChangeType.CREATE
         );
-      }
+      },
+      afterDestroy: async (message) => {
+        console.log('Message deleted');
+        wsManager.broadcast(
+          await message.getFullMessage(), ChangeType.DELETE
+        );
+      },
+      afterUpdate: async (message) => {
+        console.log('Message updated');
+        wsManager.broadcast(
+          await message.getFullMessage(), ChangeType.UPDATE
+        );
+      },
     }
   });
   return Message;
+};
+
+const ChangeType = {
+  CREATE: 'create',
+  UPDATE: 'update',
+  DELETE: 'delete'
 };
