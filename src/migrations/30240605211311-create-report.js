@@ -2,10 +2,16 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Reports', {
-      id_user: {
-        type: Sequelize.INTEGER,
+    await queryInterface.createTable('MessageReports', {
+      id: {
+        allowNull: false,
+        autoIncrement: true,
         primaryKey: true,
+        type: Sequelize.INTEGER
+      },
+
+      id_reporter: {
+        type: Sequelize.INTEGER,
         allowNull: false,
         autoIncrement: false,
         references: {
@@ -14,13 +20,12 @@ module.exports = {
         },
         onDelete: 'CASCADE',
       },
-      id_reporter: {
+      id_message: {
         type: Sequelize.INTEGER,
-        primaryKey: true,
         allowNull: false,
         autoIncrement: false,
         references: {
-          model: 'Users',
+          model: 'Messages',
           key: 'id'
         },
         onDelete: 'CASCADE',
@@ -30,7 +35,7 @@ module.exports = {
         allowNull: false,
       },
       type: {
-        type: Sequelize.ENUM("spam", "harassment", "other", "inappropriate picture"),
+        type: Sequelize.ENUM("spam", "odio", "contenido inapropiado", "otros"),
         allowNull: false,
       },
       createdAt: {
@@ -44,6 +49,6 @@ module.exports = {
     });
   },
   async down(queryInterface) {
-    await queryInterface.dropTable('Reports');
+    await queryInterface.dropTable('MessageReports');
   }
 };

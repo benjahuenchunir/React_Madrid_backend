@@ -3,20 +3,20 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface) {
-    return queryInterface.bulkInsert('Reports', [
+    return queryInterface.bulkInsert('MessageReports', [
       {
-        id_user: 1,
         id_reporter: 2,
-        message: 'El usuario esta spammeando el chat',
+        id_message: 1,
+        message: 'mal mensaje',
         type: 'spam',
         createdAt: new Date(),
         updatedAt: new Date()
       },
       {
-        id_user: 3,
         id_reporter: 1,
-        message: 'El usuario tiene una foto inapropiada',
-        type: 'inappropriate picture',
+        id_message: 2,
+        message: 'mal mensaje XD',
+        type: 'otros',
         createdAt: new Date(),
         updatedAt: new Date()
       }
@@ -24,6 +24,6 @@ module.exports = {
   },
 
   async down(queryInterface) {
-    return queryInterface.bulkDelete('Reports', null, {});
+    return queryInterface.bulkDelete('MessageReports', null, {});
   }
 };

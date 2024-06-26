@@ -64,6 +64,23 @@ router.post('/', upload.array('files'), async (ctx) => {
     }
 });
 
+router.get('/:id', async (ctx) => {
+    try {
+        const message = await Message.findByPk(ctx.params.id);
+        if (message) {
+            ctx.status = 200;
+            ctx.body = message;
+        } else {
+            ctx.status = 404;
+            ctx.body = { error: 'Message not found' };
+        }
+    } catch (error) {
+        ctx.status = 500;
+        ctx.body = { error: error.message };
+    }
+});
+
+
 router.patch('/:id', async (ctx) => {
     try {
         const { id } = ctx.params;
