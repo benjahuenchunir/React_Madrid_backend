@@ -165,4 +165,16 @@ router.delete('/:id', async (ctx) => {
     }
 });
 
+router.get('/', async (ctx) => {
+    try {
+        const messages = await Message.findAll();
+        ctx.status = 200;
+        ctx.body = messages;
+    } catch (error) {
+        ctx.status = 500;
+        ctx.body = { error: error.message };
+    }
+}   );
+
+
 module.exports = router;
