@@ -165,7 +165,7 @@ router.get('/', async (ctx) => {
     try {
         const messages = await Message.findAll();
         ctx.status = 200;
-        ctx.body = messages;
+        ctx.body = messages.map((message) => message.toDomain());
     } catch (error) {
         ctx.status = 500;
         ctx.body = { error: error.message };
