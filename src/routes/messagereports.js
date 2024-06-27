@@ -12,7 +12,7 @@ router.get('/', async (ctx) => {
             return;
         }
         ctx.status = 200;
-        ctx.body = messageReports;
+        ctx.body = messageReports.map((messageReport) => messageReport.toDomain());
     } catch (error) {
         ctx.status
         ctx.body = { error: error.message };
@@ -24,7 +24,7 @@ router.get('/:id', async (ctx) => {
         const messageReport = await MessageReport.findByPk(ctx.params.id);
         if (messageReport) {
             ctx.status = 200;
-            ctx.body = messageReport;
+            ctx.body = messageReport.toDomain();
         } else {
             ctx.status = 404;
             ctx.body = { error: 'Message report not found' };
@@ -56,8 +56,9 @@ router.post('/', async (ctx) => {
     try {
         const newMessageReport = await MessageReport.create(ctx.request.body);
         ctx.status = 201;
-        ctx.body = newMessageReport;
+        ctx.body = newMessageReport.toDomain();
     } catch (error) {
+        console.error(error);
         ctx.status = 400;
         ctx.body = { error: error.message };
     }

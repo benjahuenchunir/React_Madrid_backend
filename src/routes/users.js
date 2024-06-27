@@ -6,7 +6,7 @@ router.get('/', async (ctx) => {
     try {
         const users = await User.findAll();
         ctx.status = 200;
-        ctx.body = users;
+        ctx.body = users.map((user) => user.toDomain());
     } catch (error) {
         ctx.status = 500;
         ctx.body = { error: error.message };
