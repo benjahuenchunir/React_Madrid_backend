@@ -1,5 +1,5 @@
 const Router = require('koa-router');
-const { Message, MessageFile } = require('../models');
+const { Message, MessageFile, Chat } = require('../models');
 const router = new Router();
 const cloudinary = require('./../utils/cloudinaryConfig');
 const multer = require('@koa/multer');
@@ -7,7 +7,9 @@ const upload = multer({ dest: 'uploads/' });
 const fs = require('fs');
 const util = require('util');
 const unlink = util.promisify(fs.unlink);
-const { canSendMessage, getUserIdFromToken } = require('../utils/permissions');
+const { canSendMessage } = require('../utils/permissions');
+const { getUserIdFromToken } = require('../utils/auth');
+
 
 router.post('/', upload.array('files'), async (ctx) => {
     try {
@@ -24,7 +26,8 @@ router.post('/', upload.array('files'), async (ctx) => {
         }
 
         // Check if user is a member of the chat and has permission to send messages
-        if (!(await canSendMessage(idUser, idChat))) {
+        const chat = await Chat.findByPk(idChat);
+        if (!(await canSendMessage(chat, idUser))) {
             ctx.status = 403;
             ctx.body = { error: 'No tienes permiso para enviar mensajes en este chat' };
             return;
@@ -100,7 +103,7 @@ router.patch('/:id', async (ctx) => {
         }
 
         const idUser = getUserIdFromToken(ctx);
-        if (!canSendMessage(idUser, messageEntity.id_chat)) {
+        if (!canSendMessage(await messageEntity.getChat(), idUser)) {
             ctx.status = 403;
             ctx.body = { error: 'No tienes permiso para editar este mensaje' };
             return;
@@ -144,7 +147,7 @@ router.delete('/:id', async (ctx) => {
         }
 
         const idUser = getUserIdFromToken(ctx);
-        if (!canSendMessage(idUser, message.id_chat)) {
+        if (!canSendMessage(await message.getChat(), idUser)) {
             ctx.status = 403;
             ctx.body = { error: 'No tienes permiso para eliminar este mensaje' };
             return;

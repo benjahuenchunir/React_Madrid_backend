@@ -5,9 +5,9 @@ module.exports = {
   async up (queryInterface) {
     return queryInterface.bulkInsert('Chats', [
       {
-        name: 'General',
+        name: 'dm',
         image_url: 'https://ui-avatars.com/api/?name=General',
-        mode: 'everyone',
+        mode: 'dm',
         createdAt: new Date(),
         updatedAt: new Date()
       },

@@ -18,7 +18,7 @@ router.use('/chats', chats.routes());
 router.use('/messages', messages.routes());
 router.use('/reports', reports.routes());
 router.use('/users', users.routes());
-const { getUserIdFromToken, getTokenFromParam } = require('./utils/permissions');
+const { getUserIdFromToken, getTokenFromParam } = require('./utils/auth');
 
 
 // Websocket routes
