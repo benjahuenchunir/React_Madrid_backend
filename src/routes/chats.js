@@ -2,8 +2,9 @@ const Router = require('koa-router');
 const { Chat, User, Message, MessageFile, Member } = require('../models');
 const router = new Router();
 const { getUserIdFromToken } = require('../utils/auth');
-const { literal } = require('sequelize')
-const db = require('../models/index.js')
+const { literal, Op } = require('sequelize')
+const db = require('../models/index.js');
+const { where } = require('sequelize/lib/sequelize');
 
 router.get('/', async (ctx) => {
     try {
@@ -102,41 +103,36 @@ router.post('/', async (ctx) => {
     }
 });
 
-router.get('/users/:id', async (ctx) => {
+router.get('/dms/:id', async (ctx) => {
     try {
         const idUser = getUserIdFromToken(ctx);
         const idOtherUser = Number(ctx.params.id);
+        const targetIds = idUser === idOtherUser ? [idUser] : [idUser, idOtherUser]
 
-        const chat = await Chat.findOne({
+        const user = await User.findByPk(idUser);
+        const dms = await user.getChats({
+            where: {
+                mode: 'dm'
+            },
             include: [{
                 model: User,
-                attributes: [], // Exclude User attributes from the final result
-                through: {
-                    attributes: [] // Exclude attributes from Member
-                }
-            }],
-            where: literal(`
-                EXISTS (
-            SELECT 1
-            FROM "Members" AS "Member"
-            WHERE "Member"."id_chat" = "Chat"."id"
-            GROUP BY "Member"."id_chat"
-            HAVING COUNT(DISTINCT "Member"."id_user") = 2
-            AND ARRAY_AGG(DISTINCT "Member"."id_user") @> ARRAY[${idUser}, ${idOtherUser}]
-            AND ARRAY[${idUser}, ${idOtherUser}] @> ARRAY_AGG(DISTINCT "Member"."id_user")
-        )
-            `)
-        });
+                as: 'Users',
+                attributes: ['id']
+            }]
+        })
 
-        if (!chat) {
+        const dm = dms.find(dm => targetIds.length === dm.Users.length && dm.Users.every(user => targetIds.includes(user.id)));
+
+        if (!dm) {
             ctx.status = 404;
-            ctx.body = { error: 'Chat not found' };
+            ctx.body = { error: 'DM no encontrado' };
             return;
         }
 
         ctx.status = 200;
-        ctx.body = chat.id;
+        ctx.body = dm.id;
     } catch (error) {
+        console.error(error)
         ctx.status = 500;
         ctx.body = { error: error.message };
     }
