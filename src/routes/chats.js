@@ -87,7 +87,13 @@ router.post('/', upload.single('image'), async (ctx) => {
 
         // Create the chat
         const { name, mode, users } = ctx.request.body;
-        const userObj = JSON.parse(users)
+        let userObj = users
+        try {
+            userObj = JSON.parse(users)
+            // users was passed using FormData
+        } catch (error) {
+            // users was passed directly through body
+        }
         const image = ctx.file;
         let image_url = `https://ui-avatars.com/api/?name=${name}`;
         if (image) {
