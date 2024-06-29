@@ -136,6 +136,27 @@ paths:
           description: "Internal Server Error"
           schema:
             $ref: '#/definitions/Error'
+    post:
+      tags: ["users", ]
+      summary: "Crear un nuevo usuario"
+      description: "Crea un nuevo usuario con los datos proporcionados."
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "El usuario que debe ser creado"
+          required: true
+          schema:
+            $ref: "#/definitions/UserEntity"
+      responses:
+        201:
+          description: "Usuario creado correctamente."
+          schema:
+            $ref: "#/definitions/User"
+        500:
+          description: "Internal Server Error"
+          schema:
+            $ref: '#/definitions/Error'
+  /users/{id}:
     delete:
       tags: ["users", ]
       summary: "Elimina un usuario"
@@ -160,27 +181,30 @@ paths:
           description: "Internal Server Error"
           schema:
             $ref: '#/definitions/Error'
-    post:
+    get:
       tags: ["users", ]
-      summary: "Crear un nuevo usuario"
-      description: "Crea un nuevo usuario con los datos proporcionados."
+      summary: "Recupera un usuario"
+      description: "Recupera el usuario con la id proporcionada."
       parameters:
-        - in: "body"
-          name: "body"
-          description: "El usuario que debe ser creado"
+        - in: "query"
+          name: "id"
           required: true
-          schema:
-            $ref: "#/definitions/UserEntity"
+          description: "ID del usuario"
+          type: "integer"
+          format: "int64"
       responses:
-        201:
-          description: "Usuario creado correctamente."
+        200:
+          description: "Un usuario"
           schema:
             $ref: "#/definitions/User"
+        404:
+          description: "No se encontró el usuario"
+          schema:
+            $ref: '#/definitions/Error'
         500:
           description: "Internal Server Error"
           schema:
             $ref: '#/definitions/Error'
-  /users/{id}:
     patch:
       tags: ["users", ]
       summary: "Edita un usuario"
