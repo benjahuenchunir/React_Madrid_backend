@@ -345,6 +345,21 @@ paths:
           schema:
             $ref: '#/definitions/Error'
   /messages:
+    get:
+        tags: ["messages", ]
+        summary: "Obtiene todos los mensajes"
+        description: "Obtiene todos los mensajes"
+        responses:
+          200:
+            description: "La lista de mensajes"
+            schema:
+              type: "array"
+              items:
+                $ref: "#/definitions/Message"
+          500:
+            description: "Internal Server Error"
+            schema:
+              $ref: '#/definitions/Error'
     post:
       tags: ["messages", ]
       summary: "Crea un mensaje nuevo"
@@ -427,7 +442,31 @@ paths:
           description: "Internal Server Error"
           schema:
             $ref: '#/definitions/Error'
-
+  /messages/{id}:
+    get:
+        tags: ["messages", ]
+        summary: "Obtiene un mensaje"
+        description: "Obtiene el mensaje con el id proporcionado."
+        parameters:
+          - in: "query"
+            name: "id"
+            required: true
+            description: "ID del mensaje"
+            type: "integer"
+            format: "int64"
+        responses:
+          404:
+            description: "No se encontró el mensaje"
+            schema:
+              $ref: '#/definitions/Error'
+          200:
+            description: "El mensaje"
+            schema:
+              $ref: "#/definitions/MessageEntity"
+          500:
+            description: "Internal Server Error"
+            schema:
+              $ref: '#/definitions/Error'
 responses:
   500:
     description: Internal Server Error
