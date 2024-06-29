@@ -18,19 +18,6 @@ tags:
     description: "Todo lo relacionado a messages"
 
 paths:
-  /:
-    get:
-      summary: "Revisa el estado de la API"
-      description: "Realiza un fetch a la raíz de la API para revisar si está funcionando correctamente."
-      responses:
-        200:
-          description: "Un mensaje de 'Hello world'"
-          schema:
-            $ref: '#/definitions/Success'
-        500:
-          description: "Internal Server Error"
-          schema:
-            $ref: '#/definitions/Error'
   /auth/login:
     post:
       tags: ["auth", ]
@@ -287,6 +274,76 @@ paths:
           description: "Internal Server Error"
           schema:
             $ref: '#/definitions/Error'
+  /chats/dms/{id}:
+    get:
+      tags: ["chats"]
+      summary: "Recupera la id del DM entre dos usuarios"
+      parameters:
+        - in: "path"
+          name: "id"
+          required: true
+          description: "ID de algun usuario"
+          type: "integer"
+          format: "int64"
+      responses:
+        404:
+          description: "No se encontraró el DM"
+          schema:
+            $ref: '#/definitions/Error'
+        200:
+          description: "Una id de chat"
+          schema:
+            type: "integer"
+            format: "int64"
+        500:
+          description: "Internal Server Error"
+          schema:
+            $ref: '#/definitions/Error'
+  /chats/details/{id}:
+    get:
+      tags: ["chats"]
+      summary: "Recupera los detalles del chat (miembros, fecha creacion, etc)"
+      parameters:
+        - in: "path"
+          name: "id"
+          required: true
+          description: "ID de algun Chat"
+          type: "integer"
+          format: "int64"
+      responses:
+        404:
+          description: "No se encontraró el Chat"
+          schema:
+            $ref: '#/definitions/Error'
+        200:
+          description: "Los detalles del chat"
+          schema:
+            type: "object"
+            properties:
+              name:
+                type: "string"
+              imageUrl:
+                type: "string"
+                nullable: true
+              createdAt:
+                type: "string"
+                format: "date-time"
+              members:
+                type: "array"
+                items:
+                  $ref: '#/definitions/Member'
+              files:
+                type: "array"
+                items:
+                  $ref: '#/definitions/MessageFile'
+              urls:
+                type: "array"
+                items:
+                  type: "string"
+        500:
+          description: "Internal Server Error"
+          schema:
+            $ref: '#/definitions/Error'
   /messages:
     post:
       tags: ["messages", ]
@@ -426,6 +483,19 @@ definitions:
       lastName:
         type: "string"
       profilePictureUrl:
+        type: "string"
+  Member:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+      name:
+        type: "string"
+      lastName:
+        type: "string"
+      profilePictureUrl:
+        type: "string"
+      role:
         type: "string"
   UserEntity:
     type: "object"
