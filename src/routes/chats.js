@@ -102,7 +102,7 @@ router.post('/', upload.single('image'), async (ctx) => {
             await unlink(image.path);
         }
         const newChat = await Chat.create({ name, image_url, mode }, { transaction });
-        
+
         // Create owner member
         await Member.create({
             id_chat: newChat.id,
@@ -164,5 +164,71 @@ router.get('/dms/:id', async (ctx) => {
         ctx.body = { error: error.message };
     }
 })
+
+router.get('/details/:id', async (ctx) => {
+    try {
+        //const idUser = getUserIdFromToken(ctx);
+        const idChat = Number(ctx.params.id);
+
+        const chat = await Chat.findByPk(idChat, {
+            include: [{
+                model: Member,
+                as: 'Members',
+                include: [{
+                    model: User,
+                    as: 'User',
+                }]
+            }]
+        });
+
+        if (!chat) {
+            ctx.status = 404;
+            ctx.body = { error: 'Chat no encontrado' };
+            return;
+        }
+
+        const members = await Promise.all(chat.Members.map(async member => {
+            const userDomain = await member.User.toDomain();
+            return {
+                ...userDomain,
+                role: member.role
+            };
+        }));
+
+        const modifiedChat = {
+            name: chat.name,
+            imageUrl: chat.image_url,
+            createdAt: chat.createdAt,
+            members: members
+        };
+    
+        console.log(modifiedChat);
+
+        ctx.status = 200;
+        ctx.body = modifiedChat;
+    } catch (error) {
+        console.error(error)
+        ctx.status = 500;
+        ctx.body = { error: error.message };
+    }
+})
+
+async function getModifiedChat(chat) {
+    const members = await Promise.all(chat.Members.map(async member => {
+        const userDomain = await member.User.toDomain();
+        return {
+            ...userDomain,
+            role: member.role
+        };
+    }));
+
+    const modifiedChat = {
+        name: chat.name,
+        imageUrl: chat.image_url,
+        members: members
+    };
+
+    return modifiedChat;
+}
 
 module.exports = router;
