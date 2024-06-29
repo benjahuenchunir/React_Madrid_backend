@@ -8,8 +8,7 @@ module.exports = (sequelize, DataTypes) => {
       User.belongsToMany(models.Chat, { through: 'Member', foreignKey: 'id_user' });
       User.hasMany(models.Message, { foreignKey: 'id_user' });
       User.hasMany(models.MessageStatus, { foreignKey: 'id_user' });
-      User.hasMany(models.Report, { as: 'Report', foreignKey: 'id_user' });
-      User.hasMany(models.Report, { as: 'CreatedReport', foreignKey: 'id_reporter' });
+      User.hasMany(models.MessageReport, { as: 'CreatedReport', foreignKey: 'id_reporter' });
     }
 
     toDomain() {

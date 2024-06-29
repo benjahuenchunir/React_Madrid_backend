@@ -14,7 +14,7 @@ module.exports = {
       {
         id_chat: 1,
         id_user: 2,
-        role: 'member',
+        role: 'owner',
         createdAt: new Date(),
         updatedAt: new Date()
       },

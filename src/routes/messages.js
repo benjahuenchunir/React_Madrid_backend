@@ -1,5 +1,5 @@
 const Router = require('koa-router');
-const { Message, MessageFile } = require('../models');
+const { Message, MessageFile, Chat } = require('../models');
 const router = new Router();
 const cloudinary = require('./../utils/cloudinaryConfig');
 const multer = require('@koa/multer');
@@ -7,22 +7,27 @@ const upload = multer({ dest: 'uploads/' });
 const fs = require('fs');
 const util = require('util');
 const unlink = util.promisify(fs.unlink);
-const canSendMessage = require('../utils/permissions');
+const { canSendMessage } = require('../utils/permissions');
+const { getUserIdFromToken } = require('../utils/auth');
+
 
 router.post('/', upload.array('files'), async (ctx) => {
     try {
-        const { idUser, idChat, message, pinned, deletesAt, forwarded, respondingTo } = ctx.request.body;
+        const idUser = getUserIdFromToken(ctx);
+
+        const { idChat, message, pinned, deletesAt, forwarded, respondingTo } = ctx.request.body;
         const files = ctx.request.files;
 
         // Validate params
-        if (!idUser || !idChat || (!message && (!files || files.length === 0))) {
+        if (!idChat || (!message && (!files || files.length === 0))) {
             ctx.status = 400;
-            ctx.body = { error: 'Se requiere idUser, idChat y message o files' };
+            ctx.body = { error: 'Se requiere, idChat y message o files' };
             return;
         }
 
         // Check if user is a member of the chat and has permission to send messages
-        if (!(await canSendMessage(idUser, idChat))) {
+        const chat = await Chat.findByPk(idChat);
+        if (!(await canSendMessage(chat, idUser))) {
             ctx.status = 403;
             ctx.body = { error: 'No tienes permiso para enviar mensajes en este chat' };
             return;
@@ -62,6 +67,23 @@ router.post('/', upload.array('files'), async (ctx) => {
     }
 });
 
+router.get('/:id', async (ctx) => {
+    try {
+        const message = await Message.findByPk(ctx.params.id);
+        if (message) {
+            ctx.status = 200;
+            ctx.body = message;
+        } else {
+            ctx.status = 404;
+            ctx.body = { error: 'Message not found' };
+        }
+    } catch (error) {
+        ctx.status = 500;
+        ctx.body = { error: error.message };
+    }
+});
+
+
 router.patch('/:id', async (ctx) => {
     try {
         const { id } = ctx.params;
@@ -73,6 +95,20 @@ router.patch('/:id', async (ctx) => {
             return;
         }
 
+        const messageEntity = await Message.findOne({ where: { id: id } });
+        if (!messageEntity) {
+            ctx.status = 404;
+            ctx.body = { error: 'No se encontró un mensaje con esa id' };
+            return;
+        }
+
+        const idUser = getUserIdFromToken(ctx);
+        if (!canSendMessage(await messageEntity.getChat(), idUser)) {
+            ctx.status = 403;
+            ctx.body = { error: 'No tienes permiso para editar este mensaje' };
+            return;
+        }
+
         const updateData = {};
         if (message !== undefined) {
             updateData.message = message;
@@ -81,20 +117,10 @@ router.patch('/:id', async (ctx) => {
         if (pinned !== undefined) updateData.pinned = pinned;
         if (deletesAt !== undefined) updateData.deletes_at = deletesAt;
 
-        const [updatedRows] = await Message.update(updateData, {
-            where: { id: id }
-        });
-
-        if (updatedRows === 0) {
-            ctx.status = 404;
-            ctx.body = { error: 'No se encontró un mensaje con esa id' };
-            return;
-        }
-
-        const updatedMessage = await Message.findOne({ where: { id: id } });
+        messageEntity.update(updateData);
 
         ctx.status = 200;
-        ctx.body = await updatedMessage.getFullMessage();
+        ctx.body = await messageEntity.getFullMessage();
     } catch (error) {
         console.log(error);
         ctx.status = 500;
@@ -112,15 +138,22 @@ router.delete('/:id', async (ctx) => {
             return;
         }
 
-        const deletedRows = await Message.destroy({
-            where: { id: id }
-        });
+        const message = await Message.findOne({ where: { id: id } });
 
-        if (deletedRows === 0) {
+        if (!message) {
             ctx.status = 404;
             ctx.body = { error: 'No se encontró un mensaje con esa id' };
             return;
         }
+
+        const idUser = getUserIdFromToken(ctx);
+        if (!canSendMessage(await message.getChat(), idUser)) {
+            ctx.status = 403;
+            ctx.body = { error: 'No tienes permiso para eliminar este mensaje' };
+            return;
+        }
+
+        message.destroy();
 
         ctx.status = 200;
         ctx.body = { message: 'Mensaje eliminado con éxito' };
@@ -130,5 +163,17 @@ router.delete('/:id', async (ctx) => {
         ctx.body = { error: error.message };
     }
 });
+
+router.get('/', async (ctx) => {
+    try {
+        const messages = await Message.findAll();
+        ctx.status = 200;
+        ctx.body = messages.map((message) => message.toDomain());
+    } catch (error) {
+        ctx.status = 500;
+        ctx.body = { error: error.message };
+    }
+}   );
+
 
 module.exports = router;

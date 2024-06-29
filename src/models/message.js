@@ -1,4 +1,6 @@
 'use strict';
+const wsManager = require('../websocketManager');
+
 const {
   Model
 } = require('sequelize');
@@ -51,6 +53,7 @@ module.exports = (sequelize, DataTypes) => {
     modelName: 'Message',
     hooks: {
       afterCreate: async (message) => {
+        // Create statuses for all chat members except the one who sent the message
         const chat = await message.getChat();
         const members = await chat.getMembers();
         const otherMembers = members.filter(member => member.id_user !== message.id_user);
@@ -61,8 +64,31 @@ module.exports = (sequelize, DataTypes) => {
         }));
 
         await sequelize.models.MessageStatus.bulkCreate(messageStatuses);
-      }
+        
+        // Broadcast the new message to all connected WebSocket clients
+        wsManager.broadcast(
+          await message.getFullMessage(), ChangeType.CREATE
+        );
+      },
+      afterDestroy: async (message) => {
+        console.log('Message deleted');
+        wsManager.broadcast(
+          await message.getFullMessage(), ChangeType.DELETE
+        );
+      },
+      afterUpdate: async (message) => {
+        console.log('Message updated');
+        wsManager.broadcast(
+          await message.getFullMessage(), ChangeType.UPDATE
+        );
+      },
     }
   });
   return Message;
+};
+
+const ChangeType = {
+  CREATE: 'create',
+  UPDATE: 'update',
+  DELETE: 'delete'
 };

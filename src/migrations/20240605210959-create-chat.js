@@ -17,7 +17,7 @@ module.exports = {
         type: Sequelize.STRING
       },
       mode: {
-        type: Sequelize.ENUM("admin-only", "everyone"),
+        type: Sequelize.ENUM("admin-only", "everyone", "dm"),
         allowNull: false,
       },
       createdAt: {

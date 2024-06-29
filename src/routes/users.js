@@ -6,7 +6,7 @@ router.get('/', async (ctx) => {
     try {
         const users = await User.findAll();
         ctx.status = 200;
-        ctx.body = users;
+        ctx.body = users.map((user) => user.toDomain());
     } catch (error) {
         ctx.status = 500;
         ctx.body = { error: error.message };
@@ -55,5 +55,24 @@ router.delete('/:id', async (ctx) => {
         ctx.body = { error: error.message };
     }
 });
+
+
+router.patch('/:id', async (ctx) => {
+    try {
+        const user = await User.findByPk(ctx.params.id);
+        if (user) {
+            await user.update(ctx.request.body);
+            ctx.status = 200;
+            ctx.body = user.toDomain();
+        } else {
+            ctx.status = 404;
+            ctx.body = { error: 'User not found' };
+        }
+    } catch (error) {
+        ctx.status = 500;
+        ctx.body = { error: error.message };
+    }
+});
+
 
 module.exports = router;
