@@ -56,4 +56,23 @@ router.delete('/:id', async (ctx) => {
     }
 });
 
+
+router.patch('/:id', async (ctx) => {
+    try {
+        const user = await User.findByPk(ctx.params.id);
+        if (user) {
+            await user.update(ctx.request.body);
+            ctx.status = 200;
+            ctx.body = user.toDomain();
+        } else {
+            ctx.status = 404;
+            ctx.body = { error: 'User not found' };
+        }
+    } catch (error) {
+        ctx.status = 500;
+        ctx.body = { error: error.message };
+    }
+});
+
+
 module.exports = router;
