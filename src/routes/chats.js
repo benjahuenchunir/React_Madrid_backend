@@ -2,9 +2,13 @@ const Router = require('koa-router');
 const { Chat, User, Message, MessageFile, Member } = require('../models');
 const router = new Router();
 const { getUserIdFromToken } = require('../utils/auth');
-const { literal, Op } = require('sequelize')
 const db = require('../models/index.js');
-const { where } = require('sequelize/lib/sequelize');
+const cloudinary = require('./../utils/cloudinaryConfig');
+const multer = require('@koa/multer');
+const upload = multer({ dest: 'uploads/' });
+const fs = require('fs');
+const util = require('util');
+const unlink = util.promisify(fs.unlink);
 
 router.get('/', async (ctx) => {
     try {
@@ -76,15 +80,32 @@ router.get('/:id', async (ctx) => {
     }
 });
 
-router.post('/', async (ctx) => {
+router.post('/', upload.single('image'), async (ctx) => {
     const transaction = await db.sequelize.transaction();
     try {
         const idUser = getUserIdFromToken(ctx);
 
-        const { name, image_url, mode, users } = ctx.request.body;
+        // Create the chat
+        const { name, mode, users } = ctx.request.body;
+        const userObj = JSON.parse(users)
+        const image = ctx.file;
+        let image_url = `https://ui-avatars.com/api/?name=${name}`;
+        if (image) {
+            const result = await cloudinary.uploader.upload(image.path);
+            image_url = result.url;
+            await unlink(image.path);
+        }
         const newChat = await Chat.create({ name, image_url, mode }, { transaction });
+        
+        // Create owner member
+        await Member.create({
+            id_chat: newChat.id,
+            id_user: idUser,
+            role: 'owner'
+        }, { transaction })
 
-        for (const user of users) {
+        // Create the rest of members
+        for (const user of userObj) {
             await Member.create({
                 id_chat: newChat.id,
                 id_user: user.id,
