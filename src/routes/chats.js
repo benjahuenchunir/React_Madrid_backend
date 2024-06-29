@@ -12,7 +12,7 @@ const unlink = util.promisify(fs.unlink);
 
 router.get('/', async (ctx) => {
     try {
-        const userId = Number(ctx.query.userId);
+        const idUser = getUserIdFromToken(ctx);
 
         const allChats = await Chat.findAll({
             attributes: ['name', 'image_url', 'mode'],
@@ -29,10 +29,10 @@ router.get('/', async (ctx) => {
         });
 
         const userChats = allChats.filter(chat =>
-            chat.Users.some(user => user.id === userId)
+            chat.Users.some(user => user.id === idUser)
         );
 
-        const modifiedChats = await Promise.all(userChats.map(async chat => await chat.toDomain(userId)))
+        const modifiedChats = await Promise.all(userChats.map(async chat => await chat.toDomain(idUser)))
 
         ctx.status = 200;
         ctx.body = modifiedChats;
