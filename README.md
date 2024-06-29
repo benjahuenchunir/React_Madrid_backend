@@ -58,6 +58,14 @@ Para ver los docs en local simplemente ingresa al endpoint `/docs` desde la pagi
 - `pg-hstore`: Serializador/deserializador para el tipo de datos hstore de PostgreSQL
 - `sequelize`: ORM (Object-Relational Mapping) para Node.js
 - `koa2-swagger-ui`: UI para documentación de la API
+- `anchorme`: Para la detección de URLs en texto
+- `bcrypt`: Para hashing de contraseñas
+- `jsonwebtoken`: Para la generación de JWTs (JSON Web Tokens)
+- `koa-bodyparser`: Middleware para el análisis del cuerpo de las solicitudes HTTP
+- `koa-jwt`: Middleware para la autenticación JWT en Koa
+- `koa-websocket`: Para el soporte de WebSockets con Koa
+- `react-use-websocket`: Hooks personalizados para WebSockets en React
+- `yamljs`: Para la conversión de YAML a JSON y viceversa
 
 ## Dependencias de develop
 
