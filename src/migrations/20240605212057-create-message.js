@@ -28,7 +28,7 @@ module.exports = {
         onDelete: 'CASCADE',
       },
       message: {
-        type: Sequelize.STRING
+        type: Sequelize.TEXT
       },
       last_edit_date: {
         type: Sequelize.DATE

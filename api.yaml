@@ -16,17 +16,95 @@ tags:
     description: "Todo lo relacionado a chats"
   - name: "messages"
     description: "Todo lo relacionado a messages"
+  - name: "message-reports"
+    description: "Todo lo relacionado a reportes de mensajes"
 
 paths:
-  /:
+  /reports:
     get:
-      summary: "Revisa el estado de la API"
-      description: "Realiza un fetch a la raíz de la API para revisar si está funcionando correctamente."
+      tags: ["message-reports", ]
+      summary: "Obtiene todos los reportes"
+      description: "Obtiene todos los reportes"
       responses:
         200:
-          description: "Un mensaje de 'Hello world'"
+          description: "La lista de reportes"
           schema:
-            $ref: '#/definitions/Success'
+            type: "array"
+            items:
+              $ref: "#/definitions/MessageReport"
+        500:
+          description: "Internal Server Error"
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      tags: ["message-reports", ]
+      summary: "Crea un reporte nuevo"
+      description: "Crea un reporte nuevo con los datos proporcionados."
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "El reporte que debe ser creado"
+          required: true
+          schema:
+            $ref: "#/definitions/MessageReportEntity"
+      responses:
+        400:
+          description: "Faltaron parametros. Se requiere idUser, idMessage y reason"
+          schema:
+            $ref: '#/definitions/Error'
+        201:
+          description: "Reporte creado correctamente."
+          schema:
+            $ref: "#/definitions/MessageReport"
+        500:
+          description: "Internal Server Error"
+          schema:
+            $ref: '#/definitions/Error'
+  /reports/{id}:
+    get:
+      tags: ["message-reports", ]
+      summary: "Obtiene un reporte"
+      description: "Obtiene el reporte con el id proporcionado."
+      parameters:
+        - in: "query"
+          name: "id"
+          required: true
+          description: "ID del reporte"
+          type: "integer"
+          format: "int64"
+      responses:
+        404:
+          description: "No se encontró el reporte"
+          schema:
+            $ref: '#/definitions/Error'
+        200:
+          description: "El reporte"
+          schema:
+            $ref: "#/definitions/MessageReport"
+        500:
+          description: "Internal Server Error"
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      tags: ["message-reports", ]
+      summary: "Elimina un reporte"
+      description: "Elimina un reporte con el id proporcionado."
+      parameters:
+        - in: "query"
+          name: "id"
+          required: true
+          description: "ID del reporte"
+          type: "integer"
+          format: "int64"
+      responses:
+        404:
+          description: "No se encontró el reporte"
+          schema:
+            $ref: '#/definitions/Error'
+        200:
+          description: "Reporte eliminado correctamente."
+          schema:
+            $ref: "#/definitions/Success"
         500:
           description: "Internal Server Error"
           schema:
@@ -149,6 +227,27 @@ paths:
           description: "Internal Server Error"
           schema:
             $ref: '#/definitions/Error'
+    post:
+      tags: ["users", ]
+      summary: "Crear un nuevo usuario"
+      description: "Crea un nuevo usuario con los datos proporcionados."
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "El usuario que debe ser creado"
+          required: true
+          schema:
+            $ref: "#/definitions/UserEntity"
+      responses:
+        201:
+          description: "Usuario creado correctamente."
+          schema:
+            $ref: "#/definitions/User"
+        500:
+          description: "Internal Server Error"
+          schema:
+            $ref: '#/definitions/Error'
+  /users/{id}:
     delete:
       tags: ["users", ]
       summary: "Elimina un usuario"
@@ -173,27 +272,30 @@ paths:
           description: "Internal Server Error"
           schema:
             $ref: '#/definitions/Error'
-    post:
+    get:
       tags: ["users", ]
-      summary: "Crear un nuevo usuario"
-      description: "Crea un nuevo usuario con los datos proporcionados."
+      summary: "Recupera un usuario"
+      description: "Recupera el usuario con la id proporcionada."
       parameters:
-        - in: "body"
-          name: "body"
-          description: "El usuario que debe ser creado"
+        - in: "query"
+          name: "id"
           required: true
-          schema:
-            $ref: "#/definitions/UserEntity"
+          description: "ID del usuario"
+          type: "integer"
+          format: "int64"
       responses:
-        201:
-          description: "Usuario creado correctamente."
+        200:
+          description: "Un usuario"
           schema:
             $ref: "#/definitions/User"
+        404:
+          description: "No se encontró el usuario"
+          schema:
+            $ref: '#/definitions/Error'
         500:
           description: "Internal Server Error"
           schema:
             $ref: '#/definitions/Error'
-  /users/{id}:
     patch:
       tags: ["users", ]
       summary: "Edita un usuario"
@@ -287,7 +389,92 @@ paths:
           description: "Internal Server Error"
           schema:
             $ref: '#/definitions/Error'
+  /chats/dms/{id}:
+    get:
+      tags: ["chats"]
+      summary: "Recupera la id del DM entre dos usuarios"
+      parameters:
+        - in: "path"
+          name: "id"
+          required: true
+          description: "ID de algun usuario"
+          type: "integer"
+          format: "int64"
+      responses:
+        404:
+          description: "No se encontraró el DM"
+          schema:
+            $ref: '#/definitions/Error'
+        200:
+          description: "Una id de chat"
+          schema:
+            type: "integer"
+            format: "int64"
+        500:
+          description: "Internal Server Error"
+          schema:
+            $ref: '#/definitions/Error'
+  /chats/details/{id}:
+    get:
+      tags: ["chats"]
+      summary: "Recupera los detalles del chat (miembros, fecha creacion, etc)"
+      parameters:
+        - in: "path"
+          name: "id"
+          required: true
+          description: "ID de algun Chat"
+          type: "integer"
+          format: "int64"
+      responses:
+        404:
+          description: "No se encontraró el Chat"
+          schema:
+            $ref: '#/definitions/Error'
+        200:
+          description: "Los detalles del chat"
+          schema:
+            type: "object"
+            properties:
+              name:
+                type: "string"
+              imageUrl:
+                type: "string"
+                nullable: true
+              createdAt:
+                type: "string"
+                format: "date-time"
+              members:
+                type: "array"
+                items:
+                  $ref: '#/definitions/Member'
+              files:
+                type: "array"
+                items:
+                  $ref: '#/definitions/MessageFile'
+              urls:
+                type: "array"
+                items:
+                  type: "string"
+        500:
+          description: "Internal Server Error"
+          schema:
+            $ref: '#/definitions/Error'
   /messages:
+    get:
+        tags: ["messages", ]
+        summary: "Obtiene todos los mensajes"
+        description: "Obtiene todos los mensajes"
+        responses:
+          200:
+            description: "La lista de mensajes"
+            schema:
+              type: "array"
+              items:
+                $ref: "#/definitions/Message"
+          500:
+            description: "Internal Server Error"
+            schema:
+              $ref: '#/definitions/Error'
     post:
       tags: ["messages", ]
       summary: "Crea un mensaje nuevo"
@@ -370,7 +557,31 @@ paths:
           description: "Internal Server Error"
           schema:
             $ref: '#/definitions/Error'
-
+  /messages/{id}:
+    get:
+        tags: ["messages", ]
+        summary: "Obtiene un mensaje"
+        description: "Obtiene el mensaje con el id proporcionado."
+        parameters:
+          - in: "query"
+            name: "id"
+            required: true
+            description: "ID del mensaje"
+            type: "integer"
+            format: "int64"
+        responses:
+          404:
+            description: "No se encontró el mensaje"
+            schema:
+              $ref: '#/definitions/Error'
+          200:
+            description: "El mensaje"
+            schema:
+              $ref: "#/definitions/MessageEntity"
+          500:
+            description: "Internal Server Error"
+            schema:
+              $ref: '#/definitions/Error'
 responses:
   500:
     description: Internal Server Error
@@ -426,6 +637,19 @@ definitions:
       lastName:
         type: "string"
       profilePictureUrl:
+        type: "string"
+  Member:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+      name:
+        type: "string"
+      lastName:
+        type: "string"
+      profilePictureUrl:
+        type: "string"
+      role:
         type: "string"
   UserEntity:
     type: "object"
@@ -549,3 +773,25 @@ definitions:
         type: "string"
         format: "date-time"
         nullable: true
+  MessageReport:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+      idReporter:
+        type: "integer"
+      idMessage:
+        type: "integer"
+      type:
+        type: "string"
+      message:
+        type: "string"
+  MessageReportEntity:
+    type: "object"
+    properties:
+      id_user:
+        type: "integer"
+      id_message:
+        type: "integer"
+      type:
+        type: "string"

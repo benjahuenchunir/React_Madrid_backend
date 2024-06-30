@@ -12,8 +12,6 @@ module.exports = (sequelize, DataTypes) => {
     }
 
     async toDomain(userId) {
-      console.log("aloha")
-      console.log(userId)
       const modifiedChat = await transformChat(this, userId);
       const messages = await this.getMessages();
       const lastMessage = messages.length > 0 ? messages[0] : null;

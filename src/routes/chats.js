@@ -9,10 +9,11 @@ const upload = multer({ dest: 'uploads/' });
 const fs = require('fs');
 const util = require('util');
 const unlink = util.promisify(fs.unlink);
+const anchorme = require("anchorme").default;
 
 router.get('/', async (ctx) => {
     try {
-        const userId = Number(ctx.query.userId);
+        const idUser = getUserIdFromToken(ctx);
 
         const allChats = await Chat.findAll({
             attributes: ['name', 'image_url', 'mode'],
@@ -29,10 +30,10 @@ router.get('/', async (ctx) => {
         });
 
         const userChats = allChats.filter(chat =>
-            chat.Users.some(user => user.id === userId)
+            chat.Users.some(user => user.id === idUser)
         );
 
-        const modifiedChats = await Promise.all(userChats.map(async chat => await chat.toDomain(userId)))
+        const modifiedChats = await Promise.all(userChats.map(async chat => await chat.toDomain(idUser)))
 
         ctx.status = 200;
         ctx.body = modifiedChats;
@@ -167,7 +168,6 @@ router.get('/dms/:id', async (ctx) => {
 
 router.get('/details/:id', async (ctx) => {
     try {
-        //const idUser = getUserIdFromToken(ctx);
         const idChat = Number(ctx.params.id);
 
         const chat = await Chat.findByPk(idChat, {
@@ -178,6 +178,9 @@ router.get('/details/:id', async (ctx) => {
                     model: User,
                     as: 'User',
                 }]
+            }, {
+                model: Message,
+                as: 'Messages'
             }]
         });
 
@@ -195,14 +198,21 @@ router.get('/details/:id', async (ctx) => {
             };
         }));
 
+        const files = (await Promise.all(chat.Messages.map(async message => {
+            const messageFiles = await message.getMessageFiles();
+            return messageFiles.map(file => file.toDomain());
+        }))).flat();
+
+        const urls = await findAllMessagesWithUrls(chat.Messages);
+
         const modifiedChat = {
             name: chat.name,
             imageUrl: chat.image_url,
             createdAt: chat.createdAt,
-            members: members
+            members: members,
+            files: files,
+            urls: urls
         };
-    
-        console.log(modifiedChat);
 
         ctx.status = 200;
         ctx.body = modifiedChat;
@@ -213,22 +223,15 @@ router.get('/details/:id', async (ctx) => {
     }
 })
 
-async function getModifiedChat(chat) {
-    const members = await Promise.all(chat.Members.map(async member => {
-        const userDomain = await member.User.toDomain();
-        return {
-            ...userDomain,
-            role: member.role
-        };
-    }));
-
-    const modifiedChat = {
-        name: chat.name,
-        imageUrl: chat.image_url,
-        members: members
-    };
-
-    return modifiedChat;
+async function findAllMessagesWithUrls(messages) {
+    const messagesWithUrls = messages.filter(message => anchorme.list(message.message).length > 0);
+    return messagesWithUrls.reduce((acc, message) => {
+        const urls = anchorme.list(message.message).map(urlObj => ({
+            idMessage: message.id,
+            url: urlObj.string
+        }));
+        return acc.concat(urls);
+    }, []);
 }
 
 module.exports = router;
