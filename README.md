@@ -1,12 +1,20 @@
 # React Madrid Backend
 
-* :link: **Backend:** https://react-madrid-backend.onrender.com/
-* :link: **Docs:** https://react-madrid-backend.onrender.com/docs
-
 ## Setup
 
 1. Crear archivo `.env` copiando el archivo `.env.example`
 2. Rellenar el archivo `.env` con las credenciales correspondientes
+
+    - `DB_USER`: El nombre de usuario para la base de datos PostgreSQL.
+    - `DB_PASSWORD`: La contraseña para la base de datos PostgreSQL.
+    - `DB_NAME`: El nombre de la base de datos PostgreSQL.
+    - `DB_HOST`: La dirección del host de la base de datos PostgreSQL, por defecto `127.0.0.1` para localhost.
+    - `JWT_SECRET`: Una cadena secreta utilizada para firmar y verificar JSON Web Tokens (JWT). Debe ser una cadena segura y secreta.
+    - `PORT`: El puerto en el que el servidor de la aplicación escuchará. Por defecto puede ser `3000` o cualquier otro puerto disponible.
+    - `CLOUDINARY_CLOUD_NAME`: El nombre de tu cuenta de Cloudinary, utilizado para la gestión de imágenes y archivos.
+    - `CLOUDINARY_API_KEY`: La clave de API proporcionada por Cloudinary para autenticar las solicitudes.
+    - `CLOUDINARY_API_SECRET`: El secreto de API proporcionado por Cloudinary para autenticar las solicitudes.
+
 3. Instalar dependencias:
 
 ```bash
